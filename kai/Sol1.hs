@@ -19,13 +19,8 @@ count m (x:xs)
   | otherwise = count m xs
 
 -- 1.14
-times :: Int -> Char -> [Char]
-times x y = take x (repeat y)
-
-
 blowup :: String -> String
-blowup [] = []
-blowup xs = foldr (++) "" (zipWith times [1..] xs)
+blowup = concat . (zipWith replicate [1..])
 
 
 -- 1.15
