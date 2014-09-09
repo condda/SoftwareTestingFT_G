@@ -1,26 +1,18 @@
 
--- copy from the book
+-- 1.13
 logEquiv2 :: (Bool -> Bool -> Bool) -> (Bool -> Bool -> Bool) -> Bool
 
 logEquiv2 bf1 bf2 =
   and [(bf1 p q) == (bf2 p q) | p <- [True,False],
-                               	q <- [True,False]]
+                                 q <- [True,False]]
+
 
 (==>) :: Bool -> Bool -> Bool
-True ==> x = x
-False ==> x = True
--- end copy
+(==>) False _ = True
+(==>) True x = x 
 
--- 2.13
 test1 = logEquiv2 (\ p q -> not p == q) (\p q -> not q == p)
--- theorem 2.12.1 is True
 test2 = logEquiv2 (\ p q -> p ==> q) (\p q -> not p)
--- theorem 2.12.2 is False
-
-
-
-
-
 -- We created a countIf to count the number of passing elements in a list
 -- with a little help from our friends of stackoverflow, check:
 -- http://stackoverflow.com/questions/25647823/cant-get-point-free-notation-to-compile-in-haskell/25648161#25648161
@@ -30,8 +22,6 @@ infixr 9 .:
 
 countIf :: (a -> Bool) -> [a] -> Int
 countIf = length .: filter
-
--- end
 
 -- 2.51
 unique :: (a -> Bool) -> [a] -> Bool

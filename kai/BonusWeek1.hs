@@ -29,15 +29,8 @@ my_reverse = foldr (\x y -> y ++ [x]) []
 -- 2
 my_reverse_2 = foldl (flip (:)) []
 
-
 -- 3
--- foldr is uses lazy eveluation, for example
--- take 10 $ foldr (:) [] [1..]
--- gives an output, while
--- foldl (flip (:)) [] [1..]
--- #=> ^CInterrupted.
 
--- foldr can work with infinite amounts 
 
 -- 4
 data Creature = Lady | Tiger
@@ -67,7 +60,6 @@ solution3 = [(x,y) | x <- [Knight,Knave],
                      y <- [Knight,Knave],
                      john (x,y) == (x == Knight),
                      bill (x,y) == (y == Knight) ]
--- solution3 = [(Knave,Knight)]
 
 -- 6
 data Boy = Matthew | Peter | Jack | Arnold | Carl
@@ -87,5 +79,5 @@ table = zip declarations boys
 -- my own functions
 solution = [x | x <- [Matthew, Peter, Jack, Arnold, Carl],
               length (filter (\y -> y x) declarations) == 3]
--- Jack is the thief
+
 honest x = map snd (filter (\(f, _) -> f x) table)
