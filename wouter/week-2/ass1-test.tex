@@ -1,0 +1,144 @@
+%% LyX 2.0.6 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amssymb}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\newcommand{\noun}[1]{\textsc{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+\newenvironment{lyxcode}
+{\par\begin{list}{}{
+\setlength{\rightmargin}{\leftmargin}
+\setlength{\listparindent}{0pt}% needed for AMS classes
+\raggedright
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\normalfont\ttfamily}%
+ \item[]}
+{\end{list}}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+
+\section*{Test Report Week 2, Assignm. 1 Software Testing}
+
+
+\subsection*{Implementation}
+
+For each different outcome for the \emph{triangle} function, we developed
+two tests:
+\begin{enumerate}
+\item If the conditions for the statement of the type under test holds,
+it should return the type under test.
+\item If the conditions for the statement of the type under test do not
+hold, it should not return the type under test.
+\end{enumerate}
+The tests are based on the following statements:
+\begin{enumerate}
+\item The shape triangle($x\in\mathbb{N},y\in\mathbb{N},z\in\mathbb{N}$)
+is not a triangle (NoTriangle) in case $x$, $y$ or $z$ is lower
+than or equal to 0, thus:
+
+
+\[
+triangle(x,y,z)=\mbox{NoTriangle}\rightarrow(x\leq0\vee y\leq0\vee z\leq0)
+\]
+
+
+
+\[
+triangle(x,y,z)\neq\mbox{NoTriangle}\rightarrow\neg(x<0\vee y\leq0\vee z\leq0)
+\]
+
+
+\item The shape triangle($x\in\mathbb{N},y\in\mathbb{N},z\in\mathbb{N}$)
+is Equilateral in case all edges are of the same length, thus:
+
+
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)=\mbox{Equilateral}\rightarrow(x=y=z)
+\]
+
+
+
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)\neq\mbox{Equilateral}\rightarrow\neg(x=y=z)
+\]
+
+
+\item The shape triangle($x\in\mathbb{N},y\in\mathbb{N},z\in\mathbb{N}$)
+is Rectangular, in case one side is $\frac{1}{2}\pi$ rad, thus, by
+Pythagoras:
+
+
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)=\mbox{Rectangular}\rightarrow(x^{2}+y^{2}=z^{2}\vee x^{2}+z^{2}=y^{2}\vee z^{2}+y^{2}=x^{2})
+\]
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)\neq\mbox{Rectangular}\rightarrow\neg(x^{2}+y^{2}=z^{2}\vee x^{2}+z^{2}=y^{2}\vee z^{2}+y^{2}=x^{2})
+\]
+
+
+\item The shape triangle($x\in\mathbb{N},y\in\mathbb{N},z\in\mathbb{N}$)
+is Isosceles, in case two edges are of the same size and not all edges
+are, thus:
+
+
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)=\mbox{Isosceles}\rightarrow(\neg(x=y=z)\wedge(x=y\vee x=z\vee y=z))
+\]
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)\neq\mbox{Isosceles}\rightarrow\neg(\neg(x=y=z)\wedge(x=y\vee x=z\vee y=z))
+\]
+
+
+\item The fifth test is basically a check if the above statements are incorrect,
+without the regard of Equilateral, as it is basically an extension
+of Isosceles (i.e. weaker constraints).
+\end{enumerate}
+All these tests were implemented as subsets of the mathematical statements
+(due to infinite lists) using list comprehensions in Haskell, returning
+a set of booleans which should all be true in case of success, which
+then concludes the function (a boolean) through a call of \noun{validateAll},
+which checks if all booleans in the specified argument are true:
+\begin{lyxcode}
+validateAll~::~{[}Bool{]}~->~Bool
+
+validateAll~{[}{]}~=~True
+
+validateAll~(x:xs)
+
+~~~~~~~~|~x~=~validateAll~xs
+
+~~~~~~~~|~otherwise~=~False
+\end{lyxcode}
+Then, there is a function that runs all tests and checks if all the
+tests returned true: \noun{testTriangle}.
+\begin{lyxcode}
+testTriangle~::~Bool
+
+testTriangle~=~validateAll
+
+		{[}~testTriangle1a,~testTriangle1b,
+
+		~~testTriangle2a,~testTriangle2b,
+
+		~~testTriangle3a,~testTriangle3b,
+
+		~~testTriangle4a,~testTriangle4b,
+
+		~~testTriangle5a,~testTriangle5b~{]}
+\end{lyxcode}
+
+\subsection*{Results}
+
+The results of all functions (testTriangle (and all seperate tests
+as well)), the results were all True.
+\end{document}

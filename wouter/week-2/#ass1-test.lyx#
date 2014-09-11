@@ -1,0 +1,245 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section*
+Test Report Assignment 1 Software Testing
+\end_layout
+
+\begin_layout Standard
+For each different outcome for the 
+\emph on
+triangle
+\emph default
+ function, we developed two tests:
+\end_layout
+
+\begin_layout Enumerate
+If the conditions for the statement of the type under test holds, it should
+ return the type under test.
+\end_layout
+
+\begin_layout Enumerate
+If the conditions for the statement of the type under test do not hold,
+ it should not return the type under test.
+\end_layout
+
+\begin_layout Standard
+The tests are based on the following statements:
+\end_layout
+
+\begin_layout Enumerate
+The shape triangle(
+\begin_inset Formula $x\in\mathbb{N},y\in\mathbb{N},z\in\mathbb{N}$
+\end_inset
+
+) is not a triangle (NoTriangle) in case 
+\begin_inset Formula $x$
+\end_inset
+
+, 
+\begin_inset Formula $y$
+\end_inset
+
+ or 
+\begin_inset Formula $z$
+\end_inset
+
+ is lower than or equal to 0, thus:
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset Formula 
+\[
+triangle(x,y,z)=\mbox{NoTriangle}\rightarrow(x\leq0\vee y\leq0\vee z\leq0)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+triangle(x,y,z)\neq\mbox{NoTriangle}\rightarrow\neg(x<0\vee y\leq0\vee z\leq0)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+The shape triangle(
+\begin_inset Formula $x\in\mathbb{N},y\in\mathbb{N},z\in\mathbb{N}$
+\end_inset
+
+) is Equilateral in case all edges are of the same length, thus:
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset Formula 
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)=\mbox{Equilateral}\rightarrow(x=y=z)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)\neq\mbox{Equilateral}\rightarrow\neg(x=y=z)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+The shape triangle(
+\begin_inset Formula $x\in\mathbb{N},y\in\mathbb{N},z\in\mathbb{N}$
+\end_inset
+
+) is Rectangular, in case one side is 
+\begin_inset Formula $\frac{1}{2}\pi$
+\end_inset
+
+ rad, thus, by Pythagoras:
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset Formula 
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)=\mbox{Rectangular}\rightarrow(x^{2}+y^{2}=z^{2}\vee x^{2}+z^{2}=y^{2}\vee z^{2}+y^{2}=x^{2})
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)\neq\mbox{Rectangular}\rightarrow\neg(x^{2}+y^{2}=z^{2}\vee x^{2}+z^{2}=y^{2}\vee z^{2}+y^{2}=x^{2})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+The shape triangle(
+\begin_inset Formula $x\in\mathbb{N},y\in\mathbb{N},z\in\mathbb{N}$
+\end_inset
+
+) is Isosceles, in case two edges are of the same size and not all edges
+ are, thus:
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\begin_inset Formula 
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)=\mbox{Isosceles}\rightarrow(\neg(x=y=z)\wedge(x=y\vee x=z\vee y=z))
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+x,y,z\in\mathbb{N}\wedge triangle(x,y,z)\neq\mbox{Isosceles}\rightarrow\neg(\neg(x=y=z)\wedge(x=y\vee x=z\vee y=z))
+\]
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+The fifth test is basically a check if the above statements are incorrect,
+ without the regard of Equilateral, as it is basically an extension of Isosceles
+ (i.e.
+ weaker constraints).
+\end_layout
+
+\begin_layout Standard
+All these tests were implemented using list comprehensions in Haskell, returning
+ a set of booleans which should all be true in case of success, which then
+ concludes the function (a boolean) through a call of 
+\noun on
+validateAll
+\noun default
+, which checks if all booleans in the specified argument are true.
+\end_layout
+
+\end_body
+\end_document
