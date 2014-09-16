@@ -29,9 +29,10 @@ remElById (l:lst) id | id == 0	 = lst
 -- with a shifted random set.
 createIndexMapFor' :: [Int] -> [Int] -> Int -> [Int]
 createIndexMapFor' [] _ _ = []
+createIndexMapFor' (a:[]) _ b = [a]
 createIndexMapFor' unused (r:randomIndexes) index | r >= (length unused) = createIndexMapFor' unused randomIndexes index
-						  | r == index = createIndexMapFor' unused randomIndexes index
-						  | otherwise = (unused !! r) : (createIndexMapFor' (remElById unused r) randomIndexes (index + 1))
+						  | (unused !! r) == index= createIndexMapFor' unused randomIndexes index
+						  | otherwise            = (unused !! r) : (createIndexMapFor' (remElById unused r) randomIndexes (index + 1))
 
 
 isLastElementEqualToId x = (x !! ((length x) - 1)) == (length x) - 1
@@ -94,6 +95,20 @@ isDerangement as bs = (isSubset as bs)
 
 -- Tests
 -- No, it does not follow from the previous tests that this also works.
+
+-- The following test tests whether a call to derLst is a derangement.
 testDerLst n = do
   x <- (derLst [0..(n-1)])
   return $ (isDerangement x [0..(n-1)], x)
+
+allTrue :: [Bool] -> Bool
+allTrue [] = True
+allTrue (x:xs)  | x = allTrue xs
+		| otherwise = False
+
+-- ALL WORKS, INCLUDING SOME RANDOM TESTS, BUT 15 MINUTES BEFORE 12PM, THIS FUNCTION IS THE ONLY ONE LEFT!!
+-- testDerLsts = do
+--  x <- [ testDerLst n | n <- [0..100] ]
+--  return $ (allTrue x)
+
+-- ESTIMATED TIME: 3 DAYS
