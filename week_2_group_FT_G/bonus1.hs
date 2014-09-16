@@ -106,9 +106,10 @@ allTrue [] = True
 allTrue (x:xs)  | x = allTrue xs
 		| otherwise = False
 
--- ALL WORKS, INCLUDING SOME RANDOM TESTS, BUT 15 MINUTES BEFORE 12PM, THIS FUNCTION IS THE ONLY ONE LEFT!!
+-- ALL WORKS, INCLUDING SOME RANDOM TESTING, BUT 2 MINUTES BEFORE 12PM, THIS FUNCTION IS THE ONLY ONE LEFT!!
+-- HOWEVER, THIS FUNCTION IS TRIVIAL!
 -- testDerLsts = do
---  x <- [ testDerLst n | n <- [0..100] ]
---  return $ (allTrue x)
+--   x <- [ testDerLst n | n <- [0..100] ]
+--   return $ (allTrue x)
 
 -- ESTIMATED TIME: 3 DAYS
