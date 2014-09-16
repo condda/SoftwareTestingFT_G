@@ -190,8 +190,6 @@ isDerangement as bs = (isSubset as bs)
 	&& (isDerangement' as bs)
 -- Time spent: 20 mins
 
--- MISTAKE: { 1,2,3 } -> { 1, 3, 2 } : not a derangement, because 1 is on the same pos.
-
 -- Assignment 6
 deran :: Int -> [[Int]]
 -- We use isDerangement' here instead of isDerangement, because
