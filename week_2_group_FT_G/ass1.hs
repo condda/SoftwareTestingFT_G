@@ -197,7 +197,7 @@ deran :: Int -> [[Int]]
 deran n = [ x | x <- perms [0..n-1], isDerangement' x [0..n-1] ]
 -- Time spent: 30 mins
 
--- Assignment 7: TODO
+-- Assignment 7:
 -- Basically testDerangement is almost the same as testPermutation,
 -- with the exception that for sets where elements are on the same place,
 -- they are not derangements from each other.
