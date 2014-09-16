@@ -1,4 +1,4 @@
-module Test
+module Bonus1
 
 where
 
