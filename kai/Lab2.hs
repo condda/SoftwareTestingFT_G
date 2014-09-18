@@ -4,6 +4,9 @@ import Data.List
 import System.Random
 
 import Control.Applicative
+
+
+
 -- 1 (20min)
 data Shape = NoTriangle | Equilateral | Isosceles | Rectangular | Other deriving (Eq,Show)
 
@@ -18,7 +21,7 @@ shape x y z
   where [a,b,c] = sort [x,y,z]
 
 -- 1 testing
-test1 = [shape x y z | x <- [1..20], y <- [1..20], z <- [1..20]]
+
 
 
 -- 2 (30 min) 
@@ -48,6 +51,8 @@ isPermutation2 x y = (sort x) == (sort y)
 -- #=> True
 
 
+
+
 shuffle :: [a] -> IO [a]
 shuffle [] = return []
 shuffle lst = do
@@ -75,13 +80,10 @@ perms xs0        =  xs0 : perms' xs0 []
             interleave' f (y:ys) r = let (us,zs) = interleave' (f . (y:)) ys r
                                      in  (y:us, f (t:y:us) : zs)
 
-
-
 -- 5
 isDerangement :: Eq a => [a] -> [a] -> Bool
 isDerangement [] [] = True
 isDerangement (x:xs) (y:ys) = x /= y && isDerangement xs ys
-
 
 -- 6
 deran :: Int -> [[Int]]
@@ -97,13 +99,13 @@ sinterklaas x = do
                 then return line
                 else sinterklaas x
 
-sinterklaas [] = error "No elements to shuffle"
-sinterklaas (x:[]) = []
-sinterklaas (x:y:[]) = [2, 1]
-sitnerklaas xs = (y, pos, ys) = random (xs)
-sinterklaas n = x op plaats y
-  x = random_getal(n-1)
-  y = random_getal(n-2)
+--sinterklaas [] = error "No elements to shuffle"
+--sinterklaas (x:[]) = []
+--sinterklaas (x:y:[]) = [2, 1]
+--sitnerklaas xs = (y, pos, ys) = random (xs)
+--sinterklaas n = x op plaats y
+--  x = random_getal(n-1)
+--  y = random_getal(n-2)
 
 --number_of_derangements x
 --  | even x = (number_of_derangements x)  * x + 1
