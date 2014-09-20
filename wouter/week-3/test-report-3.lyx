@@ -1,0 +1,285 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section*
+Test Generator CNF
+\end_layout
+
+\begin_layout Standard
+In order to test whether or not the CNF-function works, we reasoned that
+ two tests should be sufficient:
+\end_layout
+
+\begin_layout Enumerate
+Equivalence test with original
+\end_layout
+
+\begin_layout Enumerate
+Grammar test, using the following rules, converted to a test using lists:
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Rules
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+L :== p | 
+\begin_inset Formula $\neg p$
+\end_inset
+
+
+\end_layout
+
+\begin_layout LyX-Code
+C :== L | L 
+\begin_inset Formula $\vee$
+\end_inset
+
+ D
+\end_layout
+
+\begin_layout LyX-Code
+C :== D | D 
+\begin_inset Formula $\wedge$
+\end_inset
+
+ C
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Standard
+For the random tests, we developed a set of functions:
+\end_layout
+
+\begin_layout LyX-Code
+testCnf n = do
+\end_layout
+
+\begin_layout LyX-Code
+  y <- testCnf 0
+\end_layout
+
+\begin_layout LyX-Code
+  z <- testCnf (n - 1)
+\end_layout
+
+\begin_layout LyX-Code
+  return $ y && z
+\end_layout
+
+\begin_layout Standard
+
+\emph on
+testCnf(n)
+\emph default
+ tests 
+\begin_inset Formula $n$
+\end_inset
+
+ random grammars for equivalence and grammar.
+ Although testCnf returns 
+\begin_inset Formula $y$
+\end_inset
+
+ && 
+\begin_inset Formula $z$
+\end_inset
+
+, note that the function that tests the equivalence and the grammar never
+ returns 
+\begin_inset Formula $false$
+\end_inset
+
+, but an error instead in case the grammar or the equivalence tests return
+ a negative result:
+\end_layout
+
+\begin_layout LyX-Code
+equivAndFstGoodGrammar x y
+\end_layout
+
+\begin_layout LyX-Code
+  | (gramC x) && (equiv x y) = True
+\end_layout
+
+\begin_layout LyX-Code
+  | (gramC x) = error ("Error in Equivalence! 'CNF':
+\backslash
+n
+\backslash
+n"
+\end_layout
+
+\begin_layout LyX-Code
+      ++ (show x) ++ "
+\backslash
+n
+\backslash
+nOriginal:
+\backslash
+n
+\backslash
+n" ++ (show y))
+\end_layout
+
+\begin_layout LyX-Code
+  | (equiv x y) = error ("Error in Grammar! 'CNF':
+\backslash
+n
+\backslash
+n"
+\end_layout
+
+\begin_layout LyX-Code
+      ++ (show x) ++ "
+\backslash
+n
+\backslash
+nOriginal:
+\backslash
+n
+\backslash
+n" ++ (show y))
+\end_layout
+
+\begin_layout LyX-Code
+  | otherwise = error ("Error in Grammar and Equivalence! 'CNF':
+\backslash
+n
+\backslash
+n"
+\end_layout
+
+\begin_layout LyX-Code
+     ++ (show x) ++ ", original:
+\backslash
+n
+\backslash
+n" ++ (show y))
+\end_layout
+
+\begin_layout Standard
+When an error occurs, it will check where the error came from.
+ Although nog very efficiently, the error reporting does show where the
+ error came from, allowing the user to be able to analyse this easily.
+ The grammar check, as it is based on lists, is defined as following:
+\end_layout
+
+\begin_layout LyX-Code
+gramL (Prop p) = True
+\end_layout
+
+\begin_layout LyX-Code
+gramL (Neg (Prop p)) = True
+\end_layout
+
+\begin_layout LyX-Code
+gramL _ = False
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+gramD (Dsj (as)) = all (
+\backslash
+x -> x) [ gramD x | x <- as ]
+\end_layout
+
+\begin_layout LyX-Code
+gramD x = gramL x
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+gramC (Cnj (as)) = all (
+\backslash
+x -> x) [ gramC x | x <- as ]
+\end_layout
+
+\begin_layout LyX-Code
+gramC x = gramD x
+\end_layout
+
+\begin_layout Standard
+Note, that this form also supports empty lists of conjunctions and/or disjunctio
+ns.
+ Based on this these definitions, running 
+\emph on
+testCnf(100) 
+\emph default
+would perform 100 tests, and if it returns 
+\emph on
+True
+\emph default
+, it would mean that it holds for 100 different test cases, thus likely
+ to be correct.
+\end_layout
+
+\end_body
+\end_document
