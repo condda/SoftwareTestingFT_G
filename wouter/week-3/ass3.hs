@@ -3,60 +3,56 @@ module Ass3 where
 import Week3
 
 -- Assignment 1. (TIME SPENT: 0:30)
--- Contradiction --
 contradiction :: Form -> Bool
 contradiction f = not (satisfiable f)
 
--- Tautology --
 tautology :: Form -> Bool
 tautology f = all (\ v -> eval v f) (allVals f)
 
--- Entails --
 entails' :: [Valuation] -> Form -> Form -> Bool
 entails' [] f1 f2 = True
 entails' (v:vs) f1 f2 = (not (eval v f2)) || (eval v f1) && (entails' vs f1 f2)
 
-
--- Entails: a |= b (which is equal to b -> a and (not b) || a).
 entails :: Form -> Form -> Bool
 entails f1 f2
 	| (allVals f1) == (allVals f2) = (equiv' (allVals f1) f1 f2)
 	| otherwise = False
 
--- Equiv --
 equiv' :: [Valuation] -> Form -> Form -> Bool
 equiv' [] f1 f2 = True
 equiv' (v:vs) f1 f2 = (eval v f1) == (eval v f2) && (equiv' vs f1 f2)
 
--- Equiv: a <-> b
 equiv :: Form -> Form -> Bool
 equiv f1 f2 = (equiv' (allVals (Cnj [f1, f2])) f1 f2)
 
--- Simple De Morgan test.
+
+
+-- TODO: Still a simple De Morgan test.
 testEquivSimple :: Bool
 testEquivSimple = equiv
 	(Neg (Dsj [(Prop 1), (Prop 2)]))
 	(Cnj [(Neg (Prop 1)), (Neg (Prop 2))])
 
--- Assignment 2. (TIME SPENT: 10:00)
--- Step 3. --
-cnf :: Form -> Form
-cnf (Neg (Prop x)) = Neg (Prop x)
-cnf (Prop x) = Prop x
-cnf (Cnj xs) = Cnj (map cnf xs)
-cnf (Dsj []) = testInCNFAndDo "Dsj []" (Dsj [])
-cnf (Dsj [x1]) = testInCNFAndDo "Dsj [x1]" (cnf x1)
-cnf (Dsj (x1:x2:[])) = testInCNFAndDo "Dsj (x1:x2:[])" (dist (cnf x1) (cnf x2))
-cnf (Dsj (x1:x2:xs)) = testInCNFAndDo "Dsj (x1:x2:xs)" (cnf (Dsj ((dist (cnf x1) (cnf x2)):xs)))
+
+
+
+
+-- Assignment 2. (TIME SPENT: 15:00)
+cnf' :: Form -> Form
+cnf' (Neg (Prop x)) = Neg (Prop x)
+cnf' (Prop x) = Prop x
+cnf' (Cnj xs) = Cnj (map cnf' xs)
+cnf' (Dsj [x1]) = cnf' x1
+cnf' (Dsj (x1:x2:[])) = dist (cnf' x1) (cnf' x2)
+cnf' (Dsj (x1:x2:xs)) = cnf' (Dsj ((dist (cnf' x1) (cnf' x2)):xs))
 
 dist :: Form -> Form -> Form
-dist (Cnj vs) f2 = testInCNFAndDo "(Cnj vs) f2" (Cnj [(dist v f2) | v <- vs])
-dist f1 (Cnj vs) = testInCNFAndDo "f1 (Cnj vs)" (Cnj [(dist f1 v) | v <- vs])
-dist x1 x2 = testInCNFAndDo "x1 x2" (Dsj [x1, x2])
+dist (Cnj vs) f2 = Cnj [(dist v f2) | v <- vs]
+dist f1 (Cnj vs) = Cnj [(dist f1 v) | v <- vs]
+dist x1 x2 = Dsj [x1, x2]
 
--- remEmptyDsjAndCnj
--- VERY evil: "the empty disjunction (OR-ing over an empty set of operands) is often defined as having the result 0." - Wikipedia.
--- ALSO very evil: the empty conjunction is True.
+-- The empty disjunction (OR-ing over an empty set of operands) is false (any of empty).
+-- The empty conjunction is true (all of empty).
 remEmptyDsjAndCnj' :: Form -> Name -> Form
 remEmptyDsjAndCnj' (Dsj []) prop = Cnj [(Prop prop), (Neg (Prop prop))]
 remEmptyDsjAndCnj' (Cnj []) prop = Dsj [(Prop prop), (Neg (Prop prop))]
@@ -71,54 +67,58 @@ remEmptyDsjAndCnj :: Form -> Form
 remEmptyDsjAndCnj xs | length (propNames xs) == 0 = createTautOrContr xs
                      | otherwise = remEmptyDsjAndCnj' xs ((propNames xs) !! 0)
 
-to_cnf :: Form -> Form
-to_cnf xs = cnf $ remEmptyDsjAndCnj $ nnf $ arrowfree xs
+-- Normalization means removing all redundant parentheses.
+remDsj :: [Form] -> [Form]
+remDsj [] = []
+remDsj ((Dsj x):xs) = (remDsj x) ++ (remDsj xs)
+remDsj (x:xs) = (x:(remDsj xs))
 
-testInCNFAndDo :: String -> Form -> Form
-testInCNFAndDo a b
-  | (gramC b) = b
-  | otherwise = error (a ++ ": " ++ (show b))
+normCnf' :: [Form] -> [Form]
+normCnf' [] = []
+normCnf' ((Dsj x):xs) = (Dsj (remDsj x)):(normCnf' xs)
+normCnf' ((Cnj x):xs) = (normCnf' x) ++ (normCnf' xs)
+normCnf' (x:xs) = (x:(normCnf' xs))
+
+normCnf :: Form -> Form
+normCnf (Cnj x) = Cnj (normCnf' x)
+normCnf (Dsj x) = Dsj (remDsj x)
+normCnf x = x
+
+-- This is the function to convert any form to CNF.
+cnf :: Form -> Form
+cnf xs = normCnf $ cnf' $ remEmptyDsjAndCnj $ nnf $ arrowfree xs
 
 
+
+
+
+-- Assignment 3:
 equivAndFstGoodGrammar x y
-  | (gramC x) && (equiv x y) = True
-  | (gramC x) = error ("Error in Equivalence! 'CNF':\n\n" ++ (show x) ++ "\n\nOriginal:\n\n" ++ (show y))
+  | (grC x) && (equiv x y) = True
+  | (grC x) = error ("Error in Equivalence! 'CNF':\n\n" ++ (show x) ++ "\n\nOriginal:\n\n" ++ (show y))
   | (equiv x y) = error ("Error in Grammar! 'CNF':\n\n" ++ (show x) ++ "\n\nOriginal:\n\n" ++ (show y))
   | otherwise = error ("Error in Grammar and Equivalence! 'CNF':\n\n" ++ (show x) ++ ", original:\n\n" ++ (show y))
 
 testCnf 0 = do
   x <- getRandomFSmpl
-  return $ equivAndFstGoodGrammar (to_cnf x) x
+  return $ equivAndFstGoodGrammar (cnf x) x
 
--- Assignment 3: Testing assignment 2.
--- We think that the most important properties are:
--- - Equivalence of CNF(X) and x
--- - The grammar should be conform to:
---   - L ::= p | -p
---   - D ::= L | L OR D
---   - C ::= D | D AND C
-
+-- Function for performing n tests on both the grammar and equality.
 testCnf n = do
   y <- testCnf 0
   z <- testCnf (n - 1)
-  return $ y && z -- Yes, I am aware of the fact that y && z won't do anything for the performance here...
+  return $ y && z
 
--- These sets of sets can test a grammar.
---   - L ::= p | -p
-gramL (Prop p) = True
-gramL (Neg (Prop p)) = True
-gramL _ = False
+-- These sets of tests can test the CNF grammar.
+grL (Prop p) = True
+grL (Neg (Prop p)) = True
+grL _ = False
 
---   - D ::= L | L OR D
-gramD (Dsj []) = False		-- Constraint: one or more disjuncts OR L
-gramD (Dsj (as)) = all (\x -> x) [ gramD x | x <- as ]
---gramD (Cnj _) = error "Cnj in Dsj"
-gramD x = gramL x
+grD (Dsj (a:as)) = all (\x -> x) [ grL x | x <- (a:as) ]
+grD x = grL x
 
---   - C ::= D | D AND C	-- Constraint: one or more conjuncts OR D
-gramC (Cnj []) = False
-gramC (Cnj (as)) = all (\x -> x) [ gramC x | x <- as ]
-gramC x = gramD x
+grC (Cnj (a:as)) = all (\x -> x) [ grD x | x <- (a:as) ]
+grC x = grD x
 
 -- Assignment 4
 type Clause = [Int]
@@ -138,6 +138,11 @@ cnf2cls (Cnj []) = []
 cnf2cls (Cnj ((Cnj xs):ys)) = cnf2cls (Cnj (xs ++ ys))
 cnf2cls (Cnj (c:cs)) = (parseClause c):(cnf2cls (Cnj cs))
 
+
+
+
+
+-- BONUS: during the lecture it was stated that building a SAT-solver is the bonus assignment.
 -- Simply find a clause where two properties are contradictory.
 -- If not found, this clause is solvable.
 isClauseSolvable :: Clause -> Bool
@@ -150,3 +155,12 @@ solveSAT [] = []
 solveSAT (x:xs)
   | isClauseSolvable x	= (x:(solveSAT xs))
   | otherwise		= solveSAT xs
+
+--testSolveSAT 0 = do
+--  x <- getRandomFSmpl
+--  return $ equivAndFstGoodGrammar (anyToCnf x) x
+
+--testSolveSAT n = do
+--  y <- testSolveSAT 0
+--  z <- testSolveSAT (n - 1)
+--  return $ y && z
