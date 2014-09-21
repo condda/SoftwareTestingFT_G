@@ -56,6 +56,7 @@ dist x1 x2 = testInCNFAndDo "x1 x2" (Dsj [x1, x2])
 
 -- remEmptyDsjAndCnj
 -- VERY evil: "the empty disjunction (OR-ing over an empty set of operands) is often defined as having the result 0." - Wikipedia.
+-- ALSO very evil: the empty conjunction is True.
 remEmptyDsjAndCnj' :: Form -> Name -> Form
 remEmptyDsjAndCnj' (Dsj []) prop = Cnj [(Prop prop), (Neg (Prop prop))]
 remEmptyDsjAndCnj' (Cnj []) prop = Dsj [(Prop prop), (Neg (Prop prop))]
@@ -72,11 +73,6 @@ remEmptyDsjAndCnj xs | length (propNames xs) == 0 = createTautOrContr xs
 
 to_cnf :: Form -> Form
 to_cnf xs = cnf $ remEmptyDsjAndCnj $ nnf $ arrowfree xs
-
-
-
-
-
 
 testInCNFAndDo :: String -> Form -> Form
 testInCNFAndDo a b
@@ -114,11 +110,13 @@ gramL (Neg (Prop p)) = True
 gramL _ = False
 
 --   - D ::= L | L OR D
+gramD (Dsj []) = False		-- Constraint: one or more disjuncts OR L
 gramD (Dsj (as)) = all (\x -> x) [ gramD x | x <- as ]
 --gramD (Cnj _) = error "Cnj in Dsj"
 gramD x = gramL x
 
---   - C ::= D | D AND C
+--   - C ::= D | D AND C	-- Constraint: one or more conjuncts OR D
+gramC (Cnj []) = False
 gramC (Cnj (as)) = all (\x -> x) [ gramC x | x <- as ]
 gramC x = gramD x
 
