@@ -25,8 +25,6 @@ equiv' (v:vs) f1 f2 = (eval v f1) == (eval v f2) && (equiv' vs f1 f2)
 equiv :: Form -> Form -> Bool
 equiv f1 f2 = (equiv' (allVals (Cnj [f1, f2])) f1 f2)
 
-
-
 -- TODO: Still a simple De Morgan test.
 testEquivSimple :: Bool
 testEquivSimple = equiv
@@ -51,7 +49,7 @@ dist (Cnj vs) f2 = Cnj [(dist v f2) | v <- vs]
 dist f1 (Cnj vs) = Cnj [(dist f1 v) | v <- vs]
 dist x1 x2 = Dsj [x1, x2]
 
--- The empty disjunction (OR-ing over an empty set of operands) is false (any of empty).
+-- The empty disjunction is false (any of empty).
 -- The empty conjunction is true (all of empty).
 remEmptyDsjAndCnj' :: Form -> Name -> Form
 remEmptyDsjAndCnj' (Dsj []) prop = Cnj [(Prop prop), (Neg (Prop prop))]
