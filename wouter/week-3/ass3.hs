@@ -30,9 +30,7 @@ equiv' (v:vs) f1 f2 = (eval v f1) == (eval v f2) && (equiv' vs f1 f2)
 
 -- Equiv: a <-> b
 equiv :: Form -> Form -> Bool
-equiv f1 f2
-	| (allVals f1) == (allVals f2) = (equiv' (allVals f1) f1 f2)
-	| otherwise	= False
+equiv f1 f2 = (equiv' (allVals (Cnj [f1, f2])) f1 f2)
 
 -- Simple De Morgan test.
 testEquivSimple :: Bool
@@ -42,33 +40,52 @@ testEquivSimple = equiv
 
 -- Assignment 2. (TIME SPENT: 10:00)
 -- Step 3. --
--- VERY evil: "the empty disjunction (OR-ing over an empty set of operands) is often defined as having the result 0." - Wikipedia.
-
 cnf :: Form -> Form
 cnf (Neg (Prop x)) = Neg (Prop x)
 cnf (Prop x) = Prop x
 cnf (Cnj xs) = Cnj (map cnf xs)
 cnf (Dsj []) = testInCNFAndDo "Dsj []" (Dsj [])
-cnf (Dsj [x1]) = testInCNFAndDo "Dsj [x1]" x1
-cnf (Dsj (x1:x2:[])) = testInCNFAndDo "Dsj (x1:x2:[])" (dist x1 x2)
-cnf (Dsj (x1:x2:xs)) = testInCNFAndDo "Dsj (x1:x2:xs)" (cnf (Dsj ((dist x1 x2):xs)))
+cnf (Dsj [x1]) = testInCNFAndDo "Dsj [x1]" (cnf x1)
+cnf (Dsj (x1:x2:[])) = testInCNFAndDo "Dsj (x1:x2:[])" (dist (cnf x1) (cnf x2))
+cnf (Dsj (x1:x2:xs)) = testInCNFAndDo "Dsj (x1:x2:xs)" (cnf (Dsj ((dist (cnf x1) (cnf x2)):xs)))
 
 dist :: Form -> Form -> Form
 dist (Cnj vs) f2 = testInCNFAndDo "(Cnj vs) f2" (Cnj [(dist v f2) | v <- vs])
 dist f1 (Cnj vs) = testInCNFAndDo "f1 (Cnj vs)" (Cnj [(dist f1 v) | v <- vs])
 dist x1 x2 = testInCNFAndDo "x1 x2" (Dsj [x1, x2])
 
+-- remEmptyDsjAndCnj
+-- VERY evil: "the empty disjunction (OR-ing over an empty set of operands) is often defined as having the result 0." - Wikipedia.
+remEmptyDsjAndCnj' :: Form -> Name -> Form
+remEmptyDsjAndCnj' (Dsj []) prop = Cnj [(Prop prop), (Neg (Prop prop))]
+remEmptyDsjAndCnj' (Cnj []) prop = Dsj [(Prop prop), (Neg (Prop prop))]
+remEmptyDsjAndCnj' (Cnj xs) prop = Cnj [(remEmptyDsjAndCnj' x prop) | x <- xs]
+remEmptyDsjAndCnj' (Dsj xs) prop = Dsj [(remEmptyDsjAndCnj' x prop) | x <- xs]
+remEmptyDsjAndCnj' xs prop = xs
+
+createTautOrContr f | contradiction f = (Cnj [(Prop 1), (Neg (Prop 1))])
+                    | otherwise       = (Dsj [(Prop 1), (Neg (Prop 1))])
+
+remEmptyDsjAndCnj :: Form -> Form
+remEmptyDsjAndCnj xs | length (propNames xs) == 0 = createTautOrContr xs
+                     | otherwise = remEmptyDsjAndCnj' xs ((propNames xs) !! 0)
+
 to_cnf :: Form -> Form
-to_cnf xs = cnf $ nnf $ arrowfree xs
+to_cnf xs = cnf $ remEmptyDsjAndCnj $ nnf $ arrowfree xs
+
+
+
+
+
 
 testInCNFAndDo :: String -> Form -> Form
 testInCNFAndDo a b
   | (gramC b) = b
-  | otherwise = error a
+  | otherwise = error (a ++ ": " ++ (show b))
 
 
 equivAndFstGoodGrammar x y
-  | (gramC x) = True
+  | (gramC x) && (equiv x y) = True
   | (gramC x) = error ("Error in Equivalence! 'CNF':\n\n" ++ (show x) ++ "\n\nOriginal:\n\n" ++ (show y))
   | (equiv x y) = error ("Error in Grammar! 'CNF':\n\n" ++ (show x) ++ "\n\nOriginal:\n\n" ++ (show y))
   | otherwise = error ("Error in Grammar and Equivalence! 'CNF':\n\n" ++ (show x) ++ ", original:\n\n" ++ (show y))
