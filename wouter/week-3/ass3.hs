@@ -14,9 +14,7 @@ entails' [] f1 f2 = True
 entails' (v:vs) f1 f2 = (not (eval v f2)) || (eval v f1) && (entails' vs f1 f2)
 
 entails :: Form -> Form -> Bool
-entails f1 f2
-	| (allVals f1) == (allVals f2) = (equiv' (allVals f1) f1 f2)
-	| otherwise = False
+entails f1 f2 = entails' (allVals (Cnj [f1, f2])) f1 f2
 
 equiv' :: [Valuation] -> Form -> Form -> Bool
 equiv' [] f1 f2 = True
@@ -24,6 +22,34 @@ equiv' (v:vs) f1 f2 = (eval v f1) == (eval v f2) && (equiv' vs f1 f2)
 
 equiv :: Form -> Form -> Bool
 equiv f1 f2 = (equiv' (allVals (Cnj [f1, f2])) f1 f2)
+
+-- We can simply test the functions as following:
+-- Assuming that satisfiable works, then for each random
+-- Form, if satisfiable, then not tautology and vice versa.
+testCont x = (satisfiable x) && (not $ contradiction x)
+          || (not $ satisfiable x) && (contradiction x) && (not (tautology x))
+
+testTaut x = (tautology x) && (satisfiable x) && (not (contradiction x))
+          || (not (tautology x))
+
+testEquivEntails x y
+  = ((entails x y) && (entails y x) && (equiv x y)
+ || ((not (entails x y)) || (not (entails y x))) && (not (equiv x y)))
+ && (entails x (Dsj []))
+ && (entails (Cnj []) x)
+
+
+
+testRules' x = (testCont x) && (testTaut x)
+
+testRules 0 = do
+  x <- getRandomFSmpl
+  return $ (testEquivEntails x x) && testRules' x
+
+testRules n = do
+  x <- testRules 0
+  y <- testRules (n - 1)
+  return $ x && y && (testEquivEntails x y)
 
 -- TODO: Still a simple De Morgan test.
 testEquivSimple :: Bool
