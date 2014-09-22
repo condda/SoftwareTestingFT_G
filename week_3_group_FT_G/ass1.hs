@@ -200,7 +200,7 @@ cls2form (cs) = Cnj [clause2dsjs c | c <- cs]
 -- We test the cnf2cls-function by converting the found clauses back to forms (using cls2form)
 -- and then checking the equivalence between the original and the found form.
 --
--- The following can simply be tested by:
+-- The following can simply be tested (with 100 the number of tests) by:
 --
 -- testForms 100 test_cnf2cls
 --
@@ -234,7 +234,7 @@ dpll yy
 
 -- Here we test for each f that was found through satisfiable, if it equals to dpll (the SAT-solver whichs checks if it can be satified).
 --
--- The following can simply be tested by:
+-- The following can simply be tested (with 100 the number of tests) by:
 --
 -- testForms 100 test_dpll_equals_satisfiable
 --
