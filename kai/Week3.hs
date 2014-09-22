@@ -185,10 +185,12 @@ getRndFs d n = do f <- getRndF d
 
 test :: Int -> (Form -> Bool) -> [Form] -> IO ()
 test n _ [] = print (show n ++ " tests passed")
-test n p (f:fs) = 
+test n p (f:fs) = do
+  print ("pass on:" ++ show f)
   if p f 
-  then do print ("pass on:" ++ show f)
-          test n p fs
+  then
+    print ("pass on:" ++ show f)
+    
   else error ("failed test on:" ++ show f)
 
 testForms :: Int -> (Form -> Bool) -> IO ()

@@ -1,6 +1,7 @@
 module Ass3 where
 
 import Week3
+import GHC.Exts
 
 -- Assignment 1. (TIME SPENT: 0:30)
 contradiction :: Form -> Bool
@@ -58,9 +59,6 @@ testEquivSimple = equiv
 	(Cnj [(Neg (Prop 1)), (Neg (Prop 2))])
 
 
-
-
-
 -- Assignment 2. (TIME SPENT: 15:00)
 cnf' :: Form -> Form
 cnf' (Neg (Prop x)) = Neg (Prop x)
@@ -113,9 +111,6 @@ cnf :: Form -> Form
 cnf xs = normCnf $ cnf' $ remEmptyDsjAndCnj $ nnf $ arrowfree xs
 
 
-
-
-
 -- Assignment 3:
 equivAndFstGoodGrammar x y
   | (grC x) && (equiv x y) = True
@@ -157,12 +152,6 @@ parseClause (Prop p) = [p]
 parseClause (Neg (Prop p)) = [-p]
 parseClause t = error ("Unexpected token: " ++ (show t))
 
-cnf2cls :: Form -> Clauses
-cnf2cls (Cnj []) = []
-cnf2cls (Cnj ((Cnj xs):ys)) = cnf2cls (Cnj (xs ++ ys))
-cnf2cls (Cnj (c:cs)) = (parseClause c):(cnf2cls (Cnj cs))
-
-
 
 
 
@@ -179,6 +168,53 @@ solveSAT [] = []
 solveSAT (x:xs)
   | isClauseSolvable x	= (x:(solveSAT xs))
   | otherwise		= solveSAT xs
+
+
+--sat_solver :: Clauses -> Clauses
+--sat_solver all@((x:xs):ys) = solve x all
+
+literal2cls :: Form -> Int
+literal2cls (Prop f) = f
+literal2cls (Neg f) = literal2cls f
+literal2cls _ = error "literal2cls"
+ 
+disjunctive2cls :: Form -> Clause
+disjunctive2cls (Dsj xs) = foldr (\y x -> x ++ (disjunctive2cls y)) [] xs
+disjunctive2cls f = [literal2cls f]
+ 
+conjunctive2cls :: Form -> Clauses
+conjunctive2cls (Cnj xs) = foldr (\y x -> x ++ (conjunctive2cls y)) [] xs
+conjunctive2cls f = [disjunctive2cls f]
+
+
+cnf2cls = conjunctive2cls
+
+
+poep :: Int -> [[Int]] -> [[Int]]
+poep x ys = filter (\y -> not (any (x ==) y)) ys2
+  where ys2 = map (plas x) ys
+
+plas :: Int -> [Int] -> [Int]
+plas x ys = filter (-x /=) ys
+
+bla [x] = True
+bla [] = True
+bla (x:y:ys)
+  | x == -y = False
+  | otherwise = bla (y:ys)
+
+dpll :: [[Int]] -> Bool
+dpll yy
+  | all (\x -> length x == 1) yy = bla (sortWith abs (map (\x -> head x) yy))
+  | any (\x -> length x == 0) yy = False
+  | otherwise = dpll((poep y yy)) || dpll((poep (-y) yy))
+    where y = head $ head $ yy
+    
+
+
+test_to_cnf_is_equivalent f = (dpll $ cnf2cls $ cnf f)
+
+
 
 --testSolveSAT 0 = do
 --  x <- getRandomFSmpl
