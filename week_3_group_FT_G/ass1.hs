@@ -209,6 +209,7 @@ test_cnf2cls f = equiv f (cls2form $ cnf2cls (cnf f))
 
 
 -- BONUS Assignment: during the lecture it was stated that building a SAT-solver is the bonus assignment.
+-- We use the dpll-algorithm (http://nl.wikipedia.org/wiki/DPLL-algoritme) for the SAT-solver.
 
 cls_replace :: Int -> [[Int]] -> [[Int]]
 cls_replace x ys = filter (\y -> not (any (x ==) y)) (map (cls_replace_neg x) ys)
