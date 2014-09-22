@@ -132,42 +132,77 @@ Testing equivalence and entailment uses the following tests for two forms
 :
 \end_layout
 
-\begin_layout LyX-Code
+\begin_layout Itemize
 \begin_inset Formula $x\vDash\perp$
 \end_inset
 
 
 \end_layout
 
-\begin_layout LyX-Code
+\begin_deeper
+\begin_layout Itemize
+Here 
+\begin_inset Formula $\perp$
+\end_inset
+
+ is used as Dsj [];
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
 \begin_inset Formula $\top\vDash x$
 \end_inset
 
 
 \end_layout
 
-\begin_layout LyX-Code
-x 
-\begin_inset Formula $\vDash$
+\begin_deeper
+\begin_layout Itemize
+Here 
+\begin_inset Formula $\perp$
 \end_inset
 
- y & y |= x -> x == y (equivalence)
+ is used as Cnj [];
 \end_layout
 
-\begin_layout LyX-Code
-x 
-\begin_inset Formula $\neq$
+\end_deeper
+\begin_layout Itemize
+\begin_inset Formula $(x\vDash y\wedge y\vDash x)\rightarrow(x=y)$
 \end_inset
 
- y 
-\begin_inset Formula $\rightarrow$
-\end_inset
 
- (!(x |= y) || !(y |= x)) (not equivalent)
 \end_layout
 
+\begin_deeper
+\begin_layout Itemize
+This tests equality: if 
+\begin_inset Formula $x$
+\end_inset
+
+ entails 
+\begin_inset Formula $y$
+\end_inset
+
+ and vice versa, then they are equal.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+\begin_inset Formula $(x\neq y)\rightarrow(\neg(x\vDash y)\vee\neg(y\vDash x))$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+This tests unequality: if x is uneqyual to y, then either x does not entail
+ y or vice versa.
+\end_layout
+
+\end_deeper
 \begin_layout Subsection*
-Assignment 2
+Assignment 3
 \end_layout
 
 \begin_layout Standard

@@ -60,16 +60,158 @@
 \begin_body
 
 \begin_layout Section*
-Test Generator CNF
+Report Week 3
+\end_layout
+
+\begin_layout Subsection*
+Assignment 1 (also in comments)
+\end_layout
+
+\begin_layout Standard
+The 
+\emph on
+testRules
+\emph default
+-function is used for testing the implemented functions for 
+\begin_inset Formula $(n+1)*3$
+\end_inset
+
+ different formulas.
+ The function 
+\emph on
+testRules2
+\emph default
+ tests equivalence and entails for two different formulas, whereas 
+\emph on
+testRules
+\emph default
+ 
+\begin_inset Formula $(n|n>0)$
+\end_inset
+
+ tests equivalence and entails for one (equal) formula and the rules:
+\end_layout
+
+\begin_layout LyX-Code
+satisfiable(x) -> 
+\begin_inset Formula $\neg$
+\end_inset
+
+contradiction x
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset Formula $\neg$
+\end_inset
+
+satisfiable x -> contradiction x & 
+\begin_inset Formula $\neg$
+\end_inset
+
+tautology x
+\end_layout
+
+\begin_layout LyX-Code
+tautology x -> satisfiable x & 
+\begin_inset Formula $\neg$
+\end_inset
+
+contradiction x
+\end_layout
+
+\begin_layout Standard
+Testing equivalence and entailment uses the following tests for two forms
+ 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
+\begin_inset Formula $y$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Formula $x\vDash\perp$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Here 
+\begin_inset Formula $\perp$
+\end_inset
+
+ is used as Dsj [];
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+\begin_inset Formula $\top\vDash x$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Here 
+\begin_inset Formula $\perp$
+\end_inset
+
+ is used as Cnj [];
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+\begin_inset Formula $(x\vDash y\wedge y\vDash x)\rightarrow(x=y)$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+This tests equality: if 
+\begin_inset Formula $x$
+\end_inset
+
+ entails 
+\begin_inset Formula $y$
+\end_inset
+
+ and vice versa, then they are equal.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+\begin_inset Formula $(x\neq y)\rightarrow(\neg(x\vDash y)\vee\neg(y\vDash x))$
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+This tests unequality: if x is uneqyual to y, then either x does not entail
+ y or vice versa.
+\end_layout
+
+\end_deeper
+\begin_layout Subsection*
+Assignment 3
 \end_layout
 
 \begin_layout Standard
 In order to test whether or not the CNF-function works, we reasoned that
- two tests should be sufficient:
+ two tests would be sufficient:
 \end_layout
 
 \begin_layout Enumerate
-Equivalence test with original
+Testing the equivalence of CNF-processed form with the original form;
 \end_layout
 
 \begin_layout Enumerate
@@ -83,7 +225,11 @@ Rules
 
 \begin_deeper
 \begin_layout LyX-Code
-L :== p | 
+L :== 
+\begin_inset Formula $p$
+\end_inset
+
+ | 
 \begin_inset Formula $\neg p$
 \end_inset
 
@@ -91,7 +237,7 @@ L :== p |
 \end_layout
 
 \begin_layout LyX-Code
-C :== L | L 
+D :== L | L 
 \begin_inset Formula $\vee$
 \end_inset
 
@@ -113,6 +259,22 @@ For the random tests, we developed a set of functions:
 \end_layout
 
 \begin_layout LyX-Code
+testCnf 0 = do
+\end_layout
+
+\begin_layout LyX-Code
+  x <- getRandomFSmpl
+\end_layout
+
+\begin_layout LyX-Code
+  return $ equivAndFstCnfGrammar (cnf x) x
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
 testCnf n = do
 \end_layout
 
@@ -134,151 +296,195 @@ testCnf n = do
 testCnf(n)
 \emph default
  tests 
-\begin_inset Formula $n$
+\begin_inset Formula $n+1$
 \end_inset
 
- random grammars for equivalence and grammar.
- Although testCnf returns 
+ random grammars for equivalence and for having the correct grammar.
+ 
+\begin_inset Formula $testCnf(0)$
+\end_inset
+
+ calls the function 
+\emph on
+equivAndFstCnfGrammar
+\emph default
+ (which should be read as: for 
+\begin_inset Formula $x$
+\end_inset
+
+ and 
 \begin_inset Formula $y$
 \end_inset
 
- && 
-\begin_inset Formula $z$
+, make sure that 
+\begin_inset Formula $x$
 \end_inset
 
-, note that the function that tests the equivalence and the grammar never
- returns 
-\begin_inset Formula $false$
+ is equivalent to 
+\begin_inset Formula $y$
 \end_inset
 
-, but an error instead in case the grammar or the equivalence tests return
- a negative result:
-\end_layout
-
-\begin_layout LyX-Code
-equivAndFstGoodGrammar x y
-\end_layout
-
-\begin_layout LyX-Code
-  | (gramC x) && (equiv x y) = True
-\end_layout
-
-\begin_layout LyX-Code
-  | (gramC x) = error ("Error in Equivalence! 'CNF':
-\backslash
-n
-\backslash
-n"
-\end_layout
-
-\begin_layout LyX-Code
-      ++ (show x) ++ "
-\backslash
-n
-\backslash
-nOriginal:
-\backslash
-n
-\backslash
-n" ++ (show y))
-\end_layout
-
-\begin_layout LyX-Code
-  | (equiv x y) = error ("Error in Grammar! 'CNF':
-\backslash
-n
-\backslash
-n"
-\end_layout
-
-\begin_layout LyX-Code
-      ++ (show x) ++ "
-\backslash
-n
-\backslash
-nOriginal:
-\backslash
-n
-\backslash
-n" ++ (show y))
-\end_layout
-
-\begin_layout LyX-Code
-  | otherwise = error ("Error in Grammar and Equivalence! 'CNF':
-\backslash
-n
-\backslash
-n"
-\end_layout
-
-\begin_layout LyX-Code
-     ++ (show x) ++ ", original:
-\backslash
-n
-\backslash
-n" ++ (show y))
-\end_layout
-
-\begin_layout Standard
-When an error occurs, it will check where the error came from.
- Although nog very efficiently, the error reporting does show where the
- error came from, allowing the user to be able to analyse this easily.
- The grammar check, as it is based on lists, is defined as following:
-\end_layout
-
-\begin_layout LyX-Code
-gramL (Prop p) = True
-\end_layout
-
-\begin_layout LyX-Code
-gramL (Neg (Prop p)) = True
-\end_layout
-
-\begin_layout LyX-Code
-gramL _ = False
-\begin_inset Newline newline
+ and that 
+\begin_inset Formula $x$
 \end_inset
 
-
-\begin_inset Newline newline
-\end_inset
-
-gramD (Dsj (as)) = all (
-\backslash
-x -> x) [ gramD x | x <- as ]
-\end_layout
-
-\begin_layout LyX-Code
-gramD x = gramL x
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Newline newline
-\end_inset
-
-gramC (Cnj (as)) = all (
-\backslash
-x -> x) [ gramC x | x <- as ]
-\end_layout
-
-\begin_layout LyX-Code
-gramC x = gramD x
-\end_layout
-
-\begin_layout Standard
-Note, that this form also supports empty lists of conjunctions and/or disjunctio
-ns.
- Based on this these definitions, running 
+ is in conjunctive normal form).
+ When an error occurs, it will check where the error came from.
+ The 
 \emph on
-testCnf(100) 
+equivAndFstCnfGrammar, 
 \emph default
-would perform 100 tests, and if it returns 
+the 
 \emph on
+grammar
+\emph default
+ test and the 
+\emph on
+equivalence 
+\emph default
+test is implemented as following.
+\end_layout
+
+\begin_layout LyX-Code
+cnfTest cnfF orig = (grC cnfF)
+\begin_inset Newline newline
+\end_inset
+
+  || error ("Error in Grammar! 'CNF':
+\backslash
+n
+\backslash
+n" ++ (show cnfF)
+\begin_inset Newline newline
+\end_inset
+
+  ++ "
+\backslash
+n
+\backslash
+nOriginal:
+\backslash
+n
+\backslash
+n" ++ (show orig))
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+equivTest cnfF orig = (equiv cnfF orig)
+\end_layout
+
+\begin_layout LyX-Code
+  || error ("Error in Equivalence! 'CNF':
+\backslash
+n
+\backslash
+n" ++ (show cnfF)
+\end_layout
+
+\begin_layout LyX-Code
+  ++ "
+\backslash
+n
+\backslash
+nOriginal:
+\backslash
+n
+\backslash
+n" ++ (show orig))
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+equivAndFstCnfGrammar x y = (cnfTest x y) && (equivTest x y)
+\end_layout
+
+\begin_layout Standard
+Whereas the actual 
+\emph on
+equiv
+\emph default
+-check was implemented in the first assignment and tested, and the 
+\emph on
+grammar
+\emph default
+-check, which is based on lists, is defined as following:
+\end_layout
+
+\begin_layout LyX-Code
+grL (Prop p) = True
+\end_layout
+
+\begin_layout LyX-Code
+grL (Neg (Prop p)) = True
+\end_layout
+
+\begin_layout LyX-Code
+grL _ = False
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+grD (Dsj (a:as)) = all (
+\backslash
+x -> x) [ grL x | x <- (a:as) ]
+\end_layout
+
+\begin_layout LyX-Code
+grD x = grL x
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+grC (Cnj (a:as)) = all (
+\backslash
+x -> x) [ grD x | x <- (a:as) ]
+\end_layout
+
+\begin_layout LyX-Code
+grC x = grD x
+\end_layout
+
+\begin_layout Standard
+Note, that we use 
+\begin_inset Formula $(a:as)$
+\end_inset
+
+ everywhere instead of as, to ensure that the list contains at least one
+ element.
+ Also note the constraint that a list of conjuncts cannot contain lists
+ of conjuncts and a list of disjuncts cannot contain lists of disjuncts.
+ Although this is probably not a mandatory constraint, it does enforce us
+ to create clean CNFs, by removing redundant parantheses.
+\end_layout
+
+\begin_layout Standard
+Testing the cnf-function with 5000 different formulas:
+\end_layout
+
+\begin_layout LyX-Code
+> testCnf 5000
+\end_layout
+
+\begin_layout LyX-Code
 True
-\emph default
-, it would mean that it holds for 100 different test cases, thus likely
- to be correct.
+\end_layout
+
+\begin_layout Standard
+resulted in true, meaning that it is very likely that the cnf-function has
+ been correctly implemented.
 \end_layout
 
 \end_body
