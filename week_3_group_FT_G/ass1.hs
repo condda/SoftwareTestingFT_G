@@ -152,10 +152,27 @@ parseClause (Prop p) = [p]
 parseClause (Neg (Prop p)) = [-p]
 parseClause t = error ("Unexpected token: " ++ (show t))
 
-cnf2cls :: Form -> Clauses
-cnf2cls (Cnj []) = []
-cnf2cls (Cnj ((Cnj xs):ys)) = cnf2cls (Cnj (xs ++ ys))
-cnf2cls (Cnj (c:cs)) = (parseClause c):(cnf2cls (Cnj cs))
+
+
+
+
+
+literal2cls :: Form -> Int
+literal2cls (Prop f) = f
+literal2cls (Neg f) = - (literal2cls f)
+literal2cls _ = error "literal2cls"
+ 
+disjunctive2cls :: Form -> Clause
+disjunctive2cls (Dsj xs) = foldr (\y x -> x ++ (disjunctive2cls y)) [] xs
+disjunctive2cls f = [literal2cls f]
+ 
+conjunctive2cls :: Form -> Clauses
+conjunctive2cls (Cnj xs) = foldr (\y x -> x ++ (conjunctive2cls y)) [] xs
+conjunctive2cls f = [disjunctive2cls f]
+
+
+
+cnf2cls = conjunctive2cls
 
 
 
@@ -165,43 +182,33 @@ cnf2cls (Cnj (c:cs)) = (parseClause c):(cnf2cls (Cnj cs))
 isClauseSolvable :: Clause -> Bool
 isClauseSolvable xs = not (any (\t -> t) [x == -y | x <- xs, y <- xs])
 
--- Returns every combination for which this SAT is solvable.
--- Basically, as the clauses are in CNF, it returns the actual solution.
-solveSAT :: Clauses -> Clauses
-solveSAT [] = []
-solveSAT (x:xs)
-  | isClauseSolvable x	= (x:(solveSAT xs))
-  | otherwise		= solveSAT xs
-
-
---sat_solver :: Clauses -> Clauses
---sat_solver all@((x:xs):ys) = solve x all
 
 
 
-poep :: Int -> [[Int]] -> [[Int]]
-poep x ys = filter (\y -> not (any (x ==) y)) ys2
-  where ys2 = map (plas x) ys
+cls_replace :: Int -> [[Int]] -> [[Int]]
+cls_replace x ys = filter (\y -> not (any (x ==) y)) (map (cls_replace_neg x) ys)
 
-plas :: Int -> [Int] -> [Int]
-plas x ys = filter (-x /=) ys
+cls_replace_neg :: Int -> [Int] -> [Int]
+cls_replace_neg x ys = filter (-x /=) ys
 
-bla [x] = True
-bla [] = True
-bla (x:y:ys)
+contradictions [x] = True
+contradictions [] = False
+contradictions (x:y:ys)
   | x == -y = False
-  | otherwise = bla (y:ys)
+  | otherwise = contradictions (y:ys)
 
-dpll :: [[Int]] -> Bool
+dpll :: Clauses -> Bool
+dpll [] = True
 dpll yy
-  | all (\x -> length x == 1) yy = bla (sortWith abs (map (\x -> head x) yy))
+  | all (\x -> length x == 1) yy = contradictions (sortWith abs (map (\x -> head x) yy))
   | any (\x -> length x == 0) yy = False
-  | otherwise = dpll((poep y yy)) || dpll((poep (-y) yy))
+  | otherwise = dpll((cls_replace y yy) ++ [[y]]) || dpll((cls_replace (-y) yy) ++ [[-y]])
     where y = head $ head $ yy
     
 
 
 test_to_cnf_is_equivalent f = (satisfiable f ) == (dpll $ cnf2cls $ cnf f)
+
 
 
 
