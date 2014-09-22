@@ -207,7 +207,7 @@ dpll yy
     
 
 
-test_to_cnf_is_equivalent f = (satisfiable f ) == (dpll $ cnf2cls $ cnf f)
+test_dpll_equals_satisfiable f = (satisfiable f ) == (dpll $ cnf2cls $ cnf f)
 
 
 
