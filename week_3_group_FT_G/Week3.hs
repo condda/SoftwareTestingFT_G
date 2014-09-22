@@ -178,7 +178,7 @@ getRndF d = do n <- getRandomInt 5
                           return (Equiv f g) 
 
 getRandomFs :: Int ->  IO [Form]
-getRandomFs n = do d <- getRandomInt 3
+getRandomFs n = do d <- getRandomInt 4
                    getRndFs d n     
 
 getRndFs :: Int -> Int -> IO [Form]
