@@ -3,6 +3,24 @@ module Ass3 where
 import Week3
 import GHC.Exts
 
+
+
+test2 :: Int -> (Form -> Form -> Bool) -> [Form] -> [Form] -> IO ()
+test2 n _ [] _ = print (show n ++ " tests passed")
+test2 n p (f:fs) (g:gs) = 
+  if p f g
+  then do print ("pass on:" ++ show f g)
+          test2 n p fs gs
+  else error ("failed test on:" ++ show f g)
+
+testForms2 :: Int -> (Form -> Bool) -> IO ()
+testForms2 n p = do 
+  fs <- getRandomFs n
+  gs <- getRandomFs n
+  test n p fs gs
+
+
+
 -- Assignment 1. (TIME SPENT: 0:30)
 contradiction :: Form -> Bool
 contradiction f = not (satisfiable f)

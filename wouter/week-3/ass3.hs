@@ -3,6 +3,10 @@ module Ass3 where
 import Week3
 import GHC.Exts
 
+
+
+
+
 -- Assignment 1. (ca. 1:00)
 contradiction :: Form -> Bool
 contradiction f = not (satisfiable f)
@@ -58,10 +62,10 @@ testEquivEntails x y
 
 testRules' x = (testCont x) && (testTaut x)
 
-testRules2 = do
+testForms2 n f= do
   x <- getRandomFSmpl
   y <- getRandomFSmpl
-  return $ (testEquivEntails x y)
+  return $ (f x y)
 
 testRules 0 = do
   x <- getRandomFSmpl
