@@ -13,17 +13,19 @@ import System.Random
 
 -- Assignment 3.
 -- Time spent: 2 hours
+
+-- TODO: setUnion not checked!!
 createSubSet 0 as = Set []
-createSubSet len as = setUnion subs $ createSubSet restLen $ drop len as
+createSubSet len as = setUnion subs (createSubSet restLen (drop len as))
   where subs = list2set $ take len as
         subsLst = set2list subs
-        restLen = (length subsLst) - len
+        restLen = len - (length subsLst)
 
-randSet len
+randSet len min max
   | len < 0 = error "length cannot be lower than 0."
   | otherwise = do
     g <- newStdGen
-    return $ createSubSet len (randoms g :: [Int])
+    return $ createSubSet len (randomRs (min, max) g)
 
 -- Assignment 4.
 setIntersect :: Ord a => Set a -> Set a -> Set a
