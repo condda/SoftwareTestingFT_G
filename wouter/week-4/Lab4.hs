@@ -2,7 +2,7 @@ module Lab4 where
 
 import SetOrd
 import Data.List
-
+import System.Random
 
 -- Assignment 1.
 -- I still have to learn the relation rules, further more, we had this in our bachelor.
@@ -12,7 +12,18 @@ import Data.List
 -- Time spent: 2 hours
 
 -- Assignment 3.
--- randSet n = 
+-- Time spent: 2 hours
+createSubSet 0 as = Set []
+createSubSet len as = setUnion subs $ createSubSet restLen $ drop len as
+  where subs = list2set $ take len as
+        subsLst = set2list subs
+        restLen = (length subsLst) - len
+
+randSet len
+  | len < 0 = error "length cannot be lower than 0."
+  | otherwise = do
+    g <- newStdGen
+    return $ createSubSet len (randoms g :: [Int])
 
 -- Assignment 4.
 setIntersect :: Ord a => Set a -> Set a -> Set a
@@ -33,7 +44,7 @@ setDiff as (Set (b:bs)) = deleteSet b $ setDiff as (Set bs)
 
 
 
--- Assingment 5.
+-- Assingment 5. - Time spent: 30 mins.
 type Rel a = [(a,a)]
 
 infixr 5 @@
