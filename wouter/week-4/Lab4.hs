@@ -74,5 +74,10 @@ trClos r = trClos' r r r
 testTrClos r = (r @@ r) `allIn` (trClos r)
 
 -- Bonus
-fp :: Eq a => (a -> a) -> a -> a
-fp f = \ x -> if x == f x then x else fp f (f x)
+-- this function calls itself until x == f x, and returns the found x.
+-- (\ x -> ((x + a/x) / 2)) performs the so-called Babylonian method,
+-- which, for each recursive step, converges to the square root of x.
+-- Thus, the more often it is called, the more precise the outcome becomes.
+-- The highest precision on a computer is reached when f(x) = x (i.e.
+-- the number does not change anymore), which is exactly what this
+-- function call does.
