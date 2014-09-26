@@ -14,15 +14,17 @@ import System.Random
 -- Assignment 3.
 -- Time spent: 2 hours
 
--- TODO: setUnion not checked!!
-createSubSet 0 as = Set []
-createSubSet len as = setUnion subs (createSubSet restLen (drop len as))
-  where subs = list2set $ take len as
-        subsLst = set2list subs
-        restLen = len - (length subsLst)
+createSubSet' len as set
+  | (length $ set2list set) == len = set
+  | otherwise = createSubSet' len (drop l as) asSet
+  where asSet = setUnion set $ list2set $ take (len - (length $ set2list set)) as
+        l = length (set2list asSet)
+
+createSubSet len as = createSubSet' len as (Set [])
 
 randSet len min max
   | len < 0 = error "length cannot be lower than 0."
+  | len > max - min + 1 = error "cannot create set, boundaries are too small."
   | otherwise = do
     g <- newStdGen
     return $ createSubSet len (randomRs (min, max) g)
