@@ -3,10 +3,7 @@ module Ass3 where
 import Week3
 import GHC.Exts
 
-
-
 -- Assignment 1. (ca. 1:00)
-
 contradiction :: Form -> Bool
 contradiction f = not (satisfiable f)
 
@@ -215,24 +212,21 @@ test_cnf2cls f = equiv f (cls2form $ cnf2cls (cnf f))
 -- We use the dpll-algorithm (http://nl.wikipedia.org/wiki/DPLL-algoritme) for the SAT-solver.
 
 cls_replace :: Int -> [[Int]] -> [[Int]]
-cls_replace x y = cls_replace_pos x (cls_replace_neg x y)
-
-cls_replace_pos :: Int -> [[Int]] -> [[Int]]
-cls_replace_pos x ys = filter (\y -> not (any (x ==) y)) 
+cls_replace x ys = filter (\y -> not (any (x ==) y)) (map (cls_replace_neg x) ys)
 
 cls_replace_neg :: Int -> [Int] -> [Int]
 cls_replace_neg x ys = filter (-x /=) ys
 
-contradictions_in_conjuction [x] = True
-contradictions_in_conjuction [] = False
-contradictions_in_conjuction (x:y:ys)
+contradictions [x] = True
+contradictions [] = False
+contradictions (x:y:ys)
   | x == -y = False
-  | otherwise = contradictions_in_conjuction (y:ys)
+  | otherwise = contradictions (y:ys)
 
 dpll :: Clauses -> Bool
 dpll [] = True
 dpll yy
-  | all (\x -> length x == 1) yy = contradictions_in_conjuction (sortWith abs (map (\x -> head x) yy))
+  | all (\x -> length x == 1) yy = contradictions (sortWith abs (map (\x -> head x) yy))
   | any (\x -> length x == 0) yy = False
   | otherwise = dpll((cls_replace y yy) ++ [[y]]) || dpll((cls_replace (-y) yy) ++ [[-y]])
     where y = head $ head $ yy
