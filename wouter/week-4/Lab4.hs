@@ -1,5 +1,7 @@
 module Lab4 where 
 
+import Test.QuickCheck
+import Test.Hspec
 import SetOrd
 import Data.List
 import System.Random
@@ -14,20 +16,18 @@ import System.Random
 -- Assignment 3.
 -- Time spent: 2 hours
 
-createSubSet' len as set
-  | (length $ set2list set) == len = set
-  | otherwise = createSubSet' len (drop l as) asSet
-  where asSet = setUnion set $ list2set $ take (len - (length $ set2list set)) as
-        l = length (set2list asSet)
+getRandomSet :: IO(Set Int)
+getRandomSet = do
+  gen <- newStdGen
+  return $ list2set $ take (head $ randomRs (3, 20) gen) $ (randomRs (0, 20) gen)
 
-createSubSet len as = createSubSet' len as (Set [])
+instance Arbitrary a => Arbitrary (Set a) where
+  arbitrary = do
+    x <- arbitrary
+    return $ (Set [x, x, x])
 
-randSet len min max
-  | len < 0 = error "length cannot be lower than 0."
-  | len > max - min + 1 = error "cannot create set, boundaries are too small."
-  | otherwise = do
-    g <- newStdGen
-    return $ createSubSet len (randomRs (min, max) g)
+testArbitrarySet x = (list2set $ set2list x) == x
+
 
 -- Assignment 4.
 setIntersect :: Ord a => Set a -> Set a -> Set a
@@ -75,7 +75,7 @@ trClos r = trClos' r r r
 
 testTrClos r = (r @@ r) `allIn` (trClos r)
 
--- Bonus
+-- Assignment 8. Bonus
 -- this function calls itself until x == f x, and returns the found x.
 -- (\ x -> ((x + a/x) / 2)) performs the so-called Babylonian method,
 -- which, for each recursive step, converges to the square root of x.
