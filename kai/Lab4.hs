@@ -6,6 +6,14 @@ import System.Random
 import Data.List
 import SetOrd
 
+import           Data.Time
+import           Data.Char (chr)
+import           Test.QuickCheck
+import           Control.Applicative
+
+import           System.Environment (getArgs)
+
+
 
 
 fp :: Eq a => (a -> a) -> a -> a
@@ -37,12 +45,23 @@ getRandomSet = do
 --  arbitrary = getRandomSet
 
 
-instance Arbitrary a => Arbitrary (Set a) where
-  arbitrary = do
-    x <- arbitrary
-    return $ (Set [x, x, x])
+--instance Arbitrary a => Arbitrary (Set a) where
+--  arbitrary = do
+--    x <- arbitrary
+--    xs <- getRandomSet
+--    return $ (Set xs)
+
+--instance (Arbitrary a, Ord a) => Arbitrary (Set a) where
+--  arbitrary = list2set <$> arbitrary
+
+instance (Arbitrary a, Ord a) => Arbitrary (Set a) where
+  arbitrary = sized $ \n ->
+    do k <- choose (0,n)
+       list2set <$> sequence [ arbitrary | _ <- [1..k] ]
 
 
+birthdayFromInteger :: Int -> [a]
+birthdayFromInteger x = []
 -- 4
 
 
@@ -94,7 +113,8 @@ test_intersection_is_subSet_of_y x y = subSet y (intersectionSet x y)
 --    it "returns the first element of an *arbitrary* list" $
 --      property $ \x xs -> head (x:xs) == (x :: Int)
    
-
+test_test :: Set Int -> Bool
+test_test x = True
 
 -- 5
 
