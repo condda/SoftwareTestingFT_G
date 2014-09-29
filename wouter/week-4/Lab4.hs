@@ -1,4 +1,9 @@
+-- DONE: 1,2,3,5,7,8
+-- TODO: 4,6
+
 module Lab4 where 
+
+import           Control.Applicative
 
 import Test.QuickCheck
 import Test.Hspec
@@ -21,13 +26,17 @@ getRandomSet = do
   gen <- newStdGen
   return $ list2set $ take (head $ randomRs (3, 20) gen) $ (randomRs (0, 20) gen)
 
-instance Arbitrary a => Arbitrary (Set a) where
-  arbitrary = do
-    x <- arbitrary
-    return $ (Set [x, x, x])
+testIsSet :: Set Int -> Bool
+testIsSet set = (list2set (set2list set)) == set
 
-testArbitrarySet x = (list2set $ set2list x) == x
+-- Test using:
+--
+--   quickCheck testIsSet
 
+instance (Arbitrary a, Ord a) => Arbitrary (Set a) where
+  arbitrary = sized $ \n ->
+    do k <- choose (0,n)
+       list2set <$> sequence [ arbitrary | _ <- [1..k] ]
 
 -- Assignment 4.
 setIntersect :: Ord a => Set a -> Set a -> Set a
@@ -46,9 +55,15 @@ setDiff as (Set []) = as
 setDiff as (Set (b:bs)) = deleteSet b $ setDiff as (Set bs)
 -- Time spent initial implementation: < 20 mins.
 
+-- TODO more tests
+testIntersect :: Set Int -> Set Int -> Bool
+testIntersect a b =
+  (subSet c a) && (subSet c b)
+  where c = setIntersect a b
 
 
--- Assingment 5. - Time spent: 30 mins.
+
+-- Assignment 5. - Time spent: 30 mins.
 type Rel a = [(a,a)]
 
 infixr 5 @@
@@ -67,13 +82,21 @@ relUnion :: Ord a => Eq a => Rel a -> Rel a -> Rel a
 relUnion r s = set2list (setUnion (list2set r) (list2set s))
 
 trClos' :: Ord a => Rel a -> Rel a -> Rel a -> Rel a
-trClos' r nxt tot = if comp `allIn` tot then tot else trClos' r comp (relUnion comp tot)
+trClos' r nxt tot = if comp `allIn` tot
+                    then tot
+                    else trClos' r comp (relUnion comp tot)
   where comp = r @@ nxt
 
 trClos :: Ord a => Rel a -> Rel a
 trClos r = trClos' r r r
 
-testTrClos r = (r @@ r) `allIn` (trClos r)
+
+-- Yes, we can use QuickCheck:
+-- quickCheck trClos
+
+testTrClos :: [(Int, Int)] -> Bool
+testTrClos rNotUnique = (r @@ r) `allIn` (trClos r)
+  where r = nub rNotUnique
 
 -- Assignment 8. Bonus
 -- this function calls itself until x == f x, and returns the found x.
