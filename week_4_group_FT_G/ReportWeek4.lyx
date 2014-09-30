@@ -376,8 +376,7 @@ From these tests, we built an hspec function which tests the three properties
 \end_inset
 
 .
- This quickCheck worked correctly.
- This is shown in assignment 6.
+ All tests passed.
 \end_layout
 
 \end_body
