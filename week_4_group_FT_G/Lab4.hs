@@ -104,7 +104,7 @@ allIn [] s = True
 allIn (r:rs) s = r `elem` s && rs `allIn` s
 
 -- Assignment 6. - Time spent: 30 mins.
-
+-- on wikipedia it it stated that the transitif closure holds iff it conains R, it is transative and minimal
 testTrClos :: IO()
 testTrClos = hspec $ do
   describe "Transitive closure" $ do
@@ -131,9 +131,10 @@ testTrClosRoRinR :: [(Int, Int)] -> Bool
 testTrClosRoRinR rNotUnique = testTransative $ trClos (nub rNotUnique)
 
 testTrClosIsMinimal :: [(Int, Int)] -> Bool
-
-testTrClosIsMinimal r = [trClos r] == (filter testTransative $ filter (allIn r) (powerList $ trClos r))
-
+--testTrClosIsMinimal' r = [trClos r] == (filter testTransative $ filter (allIn r) (powerList $ trClos r))
+testTrClosIsMinimal rNotUnique = (1==) $ length $ (filter testTransative (map (r ++) (powerList $ ((trClos r) \\ r))))
+  where r = nub rNotUnique
+  
 -- quickCheck testTrClosRinR
 -- quickCheck testTrClosRoRinR
 
