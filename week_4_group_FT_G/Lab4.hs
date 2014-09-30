@@ -107,8 +107,8 @@ allIn (r:rs) s = r `elem` s && rs `allIn` s
 testTrClos :: IO()
 testTrClos = hspec $ do
   describe "Transitive closure" $ do
-    it "contains R."
-      \x -> testTrClosRinR
+    it "contains R." $ property $
+      \x -> testTrClosRinR (x :: [(Int, Int)])
 
     it "is transitive." $ property $
       \x -> testTrClosRoRinR (x :: [(Int, Int)])
