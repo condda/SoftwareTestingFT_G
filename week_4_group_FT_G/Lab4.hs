@@ -113,6 +113,9 @@ testTrClos = hspec $ do
     it "is transitive." $ property $
       \x -> testTrClosRoRinR (x :: [(Int, Int)])
 
+    it "is minimal." $ property $
+      \x -> testTrClosIsMinimal (x :: [(Int, Int)])
+
 
 -- Assignment 7.
 -- Yes, we can use QuickCheck:
@@ -123,6 +126,11 @@ testTrClosRinR rNotUnique = r `allIn` (trClos r)
 
 testTrClosRoRinR :: [(Int, Int)] -> Bool
 testTrClosRoRinR rNotUnique = (trC @@ trC) `allIn` trC
+  where r = nub rNotUnique
+        trC = trClos r
+
+testTrClosIsMinimal :: [(Int, Int)] -> Bool
+testTrClosIsMinimal rNotUnique = True -- TODO
   where r = nub rNotUnique
         trC = trClos r
 
