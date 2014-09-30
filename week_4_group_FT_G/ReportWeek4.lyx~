@@ -76,8 +76,11 @@ testSimpleIntersect :: Set Int -> Set Int -> Bool
 \end_layout
 
 \begin_layout LyX-Code
-testSimpleIntersect a b = subSet (setIntersect a b) a && subSet (setIntersect
- a b) b
+testSimpleIntersect a b = subSet (setIntersect a b) a
+\end_layout
+
+\begin_layout LyX-Code
+  && subSet (setIntersect a b) b
 \end_layout
 
 \begin_layout Standard
@@ -105,7 +108,11 @@ testSubsetUnion :: Set Int -> Set Int -> Bool
 \end_layout
 
 \begin_layout LyX-Code
-testSubsetUnion a b = subSet a (setUnion a b) && subSet b (setUnion a b)
+testSubsetUnion a b = subSet a (setUnion a b)
+\end_layout
+
+\begin_layout LyX-Code
+  && subSet b (setUnion a b)
 \end_layout
 
 \begin_layout Standard
@@ -165,8 +172,11 @@ testEquivalenceRelations :: Set Int -> Set Int -> Bool
 \end_layout
 
 \begin_layout LyX-Code
-testEquivalenceRelations a b = (setIntersect a b) == (setDiff (setUnion
- a b) (setUnion (setDiff a b) (setDiff b a)))
+testEquivalenceRelations a b = (setIntersect a b)
+\end_layout
+
+\begin_layout LyX-Code
+  == (setDiff (setUnion a b) (setUnion (setDiff a b) (setDiff b a)))
 \end_layout
 
 \begin_layout Standard
@@ -249,22 +259,6 @@ We tested this using the following three methods:
 \end_layout
 
 \begin_layout LyX-Code
-testTransitive :: [(Int, Int)] -> Bool
-\end_layout
-
-\begin_layout LyX-Code
-testTransitive r = (r @@ r) `allIn` r
-\end_layout
-
-\begin_layout Standard
-Which tests 
-\begin_inset Formula $R\circ R\subseteq R\Leftrightarrow R\,\mbox{is\,\ transitive}$
-\end_inset
-
-:
-\end_layout
-
-\begin_layout LyX-Code
 testTrClosRoRinR :: [(Int, Int)] -> Bool
 \end_layout
 
@@ -273,27 +267,28 @@ testTrClosRoRinR r = testTransitive $ trClos r
 \end_layout
 
 \begin_layout Standard
-We then tested if 
-\begin_inset Formula $R$
+Which tests 
+\begin_inset Formula $R\circ R\subseteq R\Leftrightarrow R\,\mbox{is\,\ transitive}$
 \end_inset
 
- was in the transitive closure of 
-\begin_inset Formula $R$
-\end_inset
-
-:
+.
+ Here, 
+\noun on
+testTransitive
+\noun default
+ is defined as:
 \end_layout
 
 \begin_layout LyX-Code
-testTrClosRinR :: [(Int, Int)] -> Bool
+testTransitive :: [(Int, Int)] -> Bool
 \end_layout
 
 \begin_layout LyX-Code
-testTrClosRinR r = r `allIn` (trClos r)
+testTransitive r = (r @@ r) `allIn` r
 \end_layout
 
 \begin_layout Standard
-Here, `
+And `
 \noun on
 allIn
 \noun default
@@ -313,7 +308,27 @@ allIn (r:rs) s = r `elem` s && rs `allIn` s
 \end_layout
 
 \begin_layout Standard
-And than 
+We then tested if 
+\begin_inset Formula $R$
+\end_inset
+
+ was in the transitive closure of 
+\begin_inset Formula $R$
+\end_inset
+
+, by calling the following function:
+\end_layout
+
+\begin_layout LyX-Code
+testTrClosRinR :: [(Int, Int)] -> Bool
+\end_layout
+
+\begin_layout LyX-Code
+testTrClosRinR r = r `allIn` (trClos r)
+\end_layout
+
+\begin_layout Standard
+And finally we tested that 
 \begin_inset Formula $R^{+}$
 \end_inset
 
@@ -322,12 +337,12 @@ should be minimal, so there shouldn't be a smaller subset thats also transative
 \begin_inset Formula $O(2^{n})$
 \end_inset
 
- time test function, which basicly creates al the possible powerLists of
- 
-\begin_inset Formula $R^{+}.$
+ time test function, which basically creates al the possible powerLists
+ of 
+\begin_inset Formula $R^{+}$
 \end_inset
 
-
+ and tests if 
 \end_layout
 
 \begin_layout LyX-Code
@@ -335,12 +350,15 @@ testTrClosIsMinimal :: [(Int, Int)] -> Bool
 \end_layout
 
 \begin_layout LyX-Code
-testTrClosIsMinimal rNotUnique = (1==) $ length $ (filter   testTransitive
- (map (r ++) (powerList $ ((trClos r) 
+testTrClosIsMinimal rNotUnique = (1==) $ length $
+\end_layout
+
+\begin_layout LyX-Code
+  (filter testTransitive (map (r ++) (powerList $ ((trClos r) 
 \backslash
 
 \backslash
- r))))     where r = nub rNotUnique
+ r))))        where r = nub rNotUnique
 \end_layout
 
 \begin_layout Standard
