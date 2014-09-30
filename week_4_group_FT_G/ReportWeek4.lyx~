@@ -342,7 +342,7 @@ should be minimal, so there shouldn't be a smaller subset thats also transative
 \begin_inset Formula $R^{+}$
 \end_inset
 
- and tests if 
+ and test if there is only one possibility which is transitive.
 \end_layout
 
 \begin_layout LyX-Code
@@ -358,7 +358,11 @@ testTrClosIsMinimal rNotUnique = (1==) $ length $
 \backslash
 
 \backslash
- r))))        where r = nub rNotUnique
+ r))))
+\end_layout
+
+\begin_layout LyX-Code
+  where r = nub rNotUnique
 \end_layout
 
 \begin_layout Standard

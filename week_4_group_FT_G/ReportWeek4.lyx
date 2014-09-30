@@ -342,7 +342,7 @@ should be minimal, so there shouldn't be a smaller subset thats also transative
 \begin_inset Formula $R^{+}$
 \end_inset
 
- and test if there is only one possibility which is transitive.
+ and tests if there is only one (R) that satisfies the transitivity condition.
 \end_layout
 
 \begin_layout LyX-Code
