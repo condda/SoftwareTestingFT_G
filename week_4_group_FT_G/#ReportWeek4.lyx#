@@ -1,0 +1,198 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section*
+Test Report Assignment week 4
+\end_layout
+
+\begin_layout Standard
+To test trClos we found on wikipedia that the 
+\begin_inset Formula 
+\[
+R^{+}\Longleftrightarrow R\subseteq R^{+}\cap\, R^{+}is\: transative\,\cap\, R^{+}is\: minimal
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In the workshop we also proved that, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+R\circ R\subseteq R\Leftrightarrow R\, is\, transative
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+So we tested the following 3 things:
+\end_layout
+
+\begin_layout Standard
+That 
+\begin_inset Formula $R\subseteq R^{+}$
+\end_inset
+
+with the test method: 
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+testTrClosRinR :: [(Int, Int)] -> Bool
+\end_layout
+
+\begin_layout LyX-Code
+testTrClosRinR r = r `isInfixOf` (trClos r)
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+Than we tested if 
+\begin_inset Formula $R^{+}is\, transative$
+\end_inset
+
+ this is so..
+\end_layout
+
+\begin_layout Standard
+testTransitive :: [(Int, Int)] -> Bool
+\end_layout
+
+\begin_layout Standard
+testTransitive r = (r @@ r) `isInfixOf` r
+\end_layout
+
+\begin_layout Standard
+testTrClosRoRinR :: [(Int, Int)] -> Bool
+\end_layout
+
+\begin_layout Standard
+testTrClosRoRinR rNotUnique = testTransitive $ trClos rNotUnique
+\end_layout
+
+\begin_layout Standard
+And it 
+\begin_inset Formula $R^{+}$
+\end_inset
+
+should be minimal, so there shouldn't be a smaller subset thats also transative
+ and contains 
+\end_layout
+
+\begin_layout Standard
+We test this based on the following assumption from the workshop:
+\end_layout
+
+\begin_layout Standard
+From this, we designed the function 
+\noun on
+testTrClos
+\noun default
+:
+\end_layout
+
+\begin_layout LyX-Code
+testTrClos :: [(Int, Int)] -> Bool
+\end_layout
+
+\begin_layout LyX-Code
+testTrClos rNotUnique = (r @@ r) `allIn` (trClos r)
+\end_layout
+
+\begin_layout LyX-Code
+  where r = nub rNotUnique
+\end_layout
+
+\begin_layout Standard
+Here, the input of a random generator is converted to a unique set of elements
+ (yet, still represented as a list), after which the stated property is
+ tested.
+ This function can be tested by QuickCheck using:
+\end_layout
+
+\begin_layout LyX-Code
+quickCheck testTrClos
+\end_layout
+
+\begin_layout Standard
+Which returned 
+\noun on
+True
+\noun default
+.
+\end_layout
+
+\end_body
+\end_document

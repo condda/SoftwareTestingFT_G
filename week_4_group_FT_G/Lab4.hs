@@ -58,26 +58,26 @@ testIntersect :: IO()
 testIntersect = hspec $ do
   describe "setIntersect (a, b)" $ do
     it "should should be a subset of a and b." $ property $
-      testSimpleIntersect
+      \x y -> testSimpleIntersect (x :: Set Int) (y :: Set Int)
 
     it "should hold that the intersection of a and b is equivalent to the negation of the union of diff a b and diff b a iff setIntersect, setUnion and setDifference are correctly implemented." $ property $
-      testEquivalenceRelations
+      \x y -> testEquivalenceRelations x y
 
 testUnion = hspec $ do
   describe "setUnion (a, b)" $ do
     it "should be the superset of a and of b." $ property $
-      testSubsetUnion
+       \x y -> testSubsetUnion (x:: Set Int) (y :: Set Int)
 
     it "should hold that the intersection of a and b is equivalent to the negation of the union of diff a b and diff b a iff setIntersect, setUnion and setDifference are correctly implemented." $ property $
-      testEquivalenceRelations
+      \x y -> testEquivalenceRelations x y
 
 testDifference = hspec $ do
   describe "setDifference (a, b)" $ do
     it "should be a subset of a, but not per sé of b" $ property $
-      testDifferenceSubset
+      \x y -> testDifferenceSubset (x :: Set Int) (y :: Set Int)
 
     it "should hold that the intersection of a and b is equivalent to the negation of the union of diff a b and diff b a iff setIntersect, setUnion and setDifference are correctly implemented." $ property $
-      testEquivalenceRelations
+      \x y -> testEquivalenceRelations x y
 
 testSimpleIntersect :: Set Int -> Set Int -> Bool
 testSimpleIntersect a b = subSet (setIntersect a b) a && subSet (setIntersect a b) b
@@ -114,7 +114,7 @@ fp f x
 r @@ s = nub [ (x,z) | (x,y) <- r, (w,z) <- s, y == w ]
 
 -- Our implementation
-
+trClos :: Ord a => Rel a -> Rel a
 trClos xs = fp (\ys -> nub $ sort ((xs @@ ys) ++ xs)) xs
 
 
@@ -131,22 +131,20 @@ testTrClos = hspec $ do
       testTrClosRoRinR
 
     it "is minimal." $ property $
-      True--testTrClosIsMinimal
+      testTrClosIsMinimal
 
 
 -- Assignment 7.
 -- Yes, we can use QuickCheck:
 
 testTrClosRinR :: [(Int, Int)] -> Bool
-testTrClosRinR rNotUnique = r `isInfixOf` (trClos r)
-  where r = nub rNotUnique
+testTrClosRinR r = r `isInfixOf` (trClos r)
 
 testTransitive :: [(Int, Int)] -> Bool
 testTransitive r = (r @@ r) `isInfixOf` r
 
 testTrClosRoRinR :: [(Int, Int)] -> Bool
-testTrClosRoRinR rNotUnique = testTransitive $ trClos r
-  where r = nub rNotUnique
+testTrClosRoRinR rNotUnique = testTransitive $ trClos (nub rNotUnique)
 
 testTrClosIsMinimal :: [(Int, Int)] -> Bool
 testTrClosIsMinimal rNotUnique = (1==) $ length $ (filter testTransitive (map (r ++) (powerList $ ((trClos r) \\ r))))
