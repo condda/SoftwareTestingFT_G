@@ -109,31 +109,30 @@ testTrClos :: IO()
 testTrClos = hspec $ do
   describe "Transitive closure" $ do
     it "contains R." $ property $
-      \x -> testTrClosRinR (x :: [(Int, Int)])
+      testTrClosRinR
 
     it "is transitive." $ property $
-      \x -> testTrClosRoRinR (x :: [(Int, Int)])
+      testTrClosRoRinR
 
     it "is minimal." $ property $
-      \x -> testTrClosIsMinimal (x :: [(Int, Int)])
+      testTrClosIsMinimal
 
 
 -- Assignment 7.
 -- Yes, we can use QuickCheck:
 
 testTrClosRinR :: [(Int, Int)] -> Bool
-testTrClosRinR rNotUnique = r `allIn` (trClos r)
-  where r = nub rNotUnique
+testTrClosRinR r = r `allIn` (trClos r)
+
+testTransative :: [(Int, Int)] -> Bool
+testTransative r = (r @@ r) `allIn` r
 
 testTrClosRoRinR :: [(Int, Int)] -> Bool
-testTrClosRoRinR rNotUnique = (trC @@ trC) `allIn` trC
-  where r = nub rNotUnique
-        trC = trClos r
+testTrClosRoRinR rNotUnique = testTransative $ trClos (nub rNotUnique)
 
 testTrClosIsMinimal :: [(Int, Int)] -> Bool
-testTrClosIsMinimal rNotUnique = True -- TODO
-  where r = nub rNotUnique
-        trC = trClos r
+
+testTrClosIsMinimal r = [trClos r] == (filter testTransative $ filter (allIn r) (powerList $ trClos r))
 
 -- quickCheck testTrClosRinR
 -- quickCheck testTrClosRoRinR
