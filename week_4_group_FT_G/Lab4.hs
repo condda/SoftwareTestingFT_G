@@ -3,7 +3,7 @@
 
 module Lab4 where 
 
-import           Control.Applicative
+import Control.Applicative
 
 import Test.QuickCheck
 import Test.Hspec
@@ -55,30 +55,31 @@ setDiff as (Set (b:bs)) = deleteSet b $ setDiff as (Set bs)
 -- Not only QuickCheck, but also HSpec!
 testIntersect :: IO()
 testIntersect = hspec $ do
-  describe "Intersect" $ do
-    it "simple intersection test 1." $ 
-      setIntersect (Set [1,2,3,4]) (Set [-100..100]) == Set [1,2,3,4]
+  describe "Intersect (a, b)" $ do
+    it "should should be a subset of a and b." $ property $
+      \x y -> testSimpleIntersect (x :: Set Int) (y :: Set Int)
 
-    it "simple intersection test 2." $ 
-      setIntersect (Set [-100..100]) (Set [1,2,3,4]) == Set [1,2,3,4]
-
-testSubsetUnion = hspec $ do
-  describe "Subset and union" $ do
-    it "x should be a subset of (the union of x and y)" $ property $
-       \x y -> subSet x (setUnion (x :: Set Int) (y :: Set Int))
-
-    it "y should be a subset of (the union of x and y)" $ property $
-      \x y -> subSet y (setUnion (x :: Set Int) (y :: Set Int))
+testUnion = hspec $ do
+  describe "Union (a, b)" $ do
+    it "should be the superset of a and of b." $ property $
+       \x y -> testSubsetUnion (x:: Set Int) (y :: Set Int)
 
 testDifference = hspec $ do
-  describe "Difference" $ do
-    it "(The difference of x and y) should be a subset of x" $ property $
-      \x y -> subSet (setDiff (x :: Set Int) (y :: Set Int)) x
+  describe "Difference (a, b)" $ do
+    it "should be a subset of a, but not per sé of b" $ property $
+      \x y -> testDifferenceSubset (x :: Set Int) (y :: Set Int)
 
-    it "(The difference of x and y) have no elements in common with y" $ property $
-      \x y -> isEmpty $ setIntersect (setDiff (x :: Set Int) (y :: Set Int)) y
+testSimpleIntersect a b = subSet (setIntersect a b) a && subSet (setIntersect a b) b
 
+testSubsetUnion a b = subSet a (setUnion a b) && subSet b (setUnion a b)
 
+testDifferenceSubset a b = subSet (setDiff a b) a
+
+-- Test using quickCheck:
+--
+-- quickCheck testSimpleIntersect
+-- quickCheck testSubsetUnion
+-- quickCheck testDifferenceSubset
 
 -- Assignment 5. - Time spent: 30 mins.
 type Rel a = [(a,a)]
