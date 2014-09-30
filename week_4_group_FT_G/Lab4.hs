@@ -138,13 +138,13 @@ testTrClos = hspec $ do
 -- Yes, we can use QuickCheck:
 
 testTrClosRinR :: [(Int, Int)] -> Bool
-testTrClosRinR r = r `isInfixOf` (trClos r)
+testTrClosRinR r = r `isInfixOf` (trClos $ nub r)
 
 testTransitive :: [(Int, Int)] -> Bool
 testTransitive r = (r @@ r) `isInfixOf` r
 
 testTrClosRoRinR :: [(Int, Int)] -> Bool
-testTrClosRoRinR rNotUnique = testTransitive $ trClos (nub rNotUnique)
+testTrClosRoRinR rNotUnique = testTransitive $ trClos rNotUnique
 
 testTrClosIsMinimal :: [(Int, Int)] -> Bool
 testTrClosIsMinimal rNotUnique = (1==) $ length $ (filter testTransitive (map (r ++) (powerList $ ((trClos r) \\ r))))
