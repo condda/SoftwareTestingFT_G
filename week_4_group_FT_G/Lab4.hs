@@ -58,26 +58,26 @@ testIntersect :: IO()
 testIntersect = hspec $ do
   describe "setIntersect (a, b)" $ do
     it "should should be a subset of a and b." $ property $
-      \x y -> testSimpleIntersect (x :: Set Int) (y :: Set Int)
+      testSimpleIntersect
 
     it "should hold that the intersection of a and b is equivalent to the negation of the union of diff a b and diff b a iff setIntersect, setUnion and setDifference are correctly implemented." $ property $
-      \x y -> testEquivalenceRelations x y
+      testEquivalenceRelations
 
 testUnion = hspec $ do
   describe "setUnion (a, b)" $ do
     it "should be the superset of a and of b." $ property $
-       \x y -> testSubsetUnion (x:: Set Int) (y :: Set Int)
+      testSubsetUnion
 
     it "should hold that the intersection of a and b is equivalent to the negation of the union of diff a b and diff b a iff setIntersect, setUnion and setDifference are correctly implemented." $ property $
-      \x y -> testEquivalenceRelations x y
+      testEquivalenceRelations
 
 testDifference = hspec $ do
   describe "setDifference (a, b)" $ do
     it "should be a subset of a, but not per sé of b" $ property $
-      \x y -> testDifferenceSubset (x :: Set Int) (y :: Set Int)
+      testDifferenceSubset
 
     it "should hold that the intersection of a and b is equivalent to the negation of the union of diff a b and diff b a iff setIntersect, setUnion and setDifference are correctly implemented." $ property $
-      \x y -> testEquivalenceRelations x y
+      testEquivalenceRelations
 
 testSimpleIntersect :: Set Int -> Set Int -> Bool
 testSimpleIntersect a b = subSet (setIntersect a b) a && subSet (setIntersect a b) b
