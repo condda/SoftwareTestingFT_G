@@ -253,12 +253,12 @@ testTransitive :: [(Int, Int)] -> Bool
 \end_layout
 
 \begin_layout LyX-Code
-testTransitive r = (r @@ r) `isInfixOf` r
+testTransitive r = (r @@ r) `allIn` r
 \end_layout
 
 \begin_layout Standard
 Which tests 
-\begin_inset Formula $R\circ R\subseteq R\Leftrightarrow R\,\mbox{is\, transitive}$
+\begin_inset Formula $R\circ R\subseteq R\Leftrightarrow R\,\mbox{is\,\ transitive}$
 \end_inset
 
 :
@@ -281,6 +281,10 @@ We then tested if
 \begin_inset Formula $R$
 \end_inset
 
+, by calling the following function with 
+\emph on
+trClos
+\emph default
 :
 \end_layout
 
@@ -289,7 +293,27 @@ testTrClosRinR :: [(Int, Int)] -> Bool
 \end_layout
 
 \begin_layout LyX-Code
-testTrClosRinR r = r `isInfixOf` (trClos r)
+testTrClosRinR r = r `allIn` (trClos r)
+\end_layout
+
+\begin_layout Standard
+Here, `
+\noun on
+allIn
+\noun default
+` is defined as following:
+\end_layout
+
+\begin_layout LyX-Code
+allIn :: Eq a => Rel a -> Rel a -> Bool
+\end_layout
+
+\begin_layout LyX-Code
+allIn [] s = True
+\end_layout
+
+\begin_layout LyX-Code
+allIn (r:rs) s = r `elem` s && rs `allIn` s
 \end_layout
 
 \begin_layout Standard
