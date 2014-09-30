@@ -82,6 +82,8 @@ testDifferenceSubset a b = subSet (setDiff a b) a
 -- quickCheck testDifferenceSubset
 
 -- Assignment 5. - Time spent: 30 mins.
+
+-- this was aready given
 type Rel a = [(a,a)]
 
 infixr 5 @@
@@ -95,13 +97,12 @@ fp f x
 
 r @@ s = nub [ (x,z) | (x,y) <- r, (w,z) <- s, y == w ]
 
+-- my implementation
+trClos :: Ord a => Rel a -> Rel a
 trClos xs = fp (\ys -> nub $ sort ((xs @@ ys) ++ xs)) xs
 
 set2list (Set s) = s
 
-allIn :: Eq a => Rel a -> Rel a -> Bool
-allIn [] s = True
-allIn (r:rs) s = r `elem` s && rs `allIn` s
 
 -- Assignment 6. - Time spent: 30 mins.
 -- on wikipedia it it stated that the transitif closure holds iff it conains R, it is transative and minimal
@@ -122,21 +123,26 @@ testTrClos = hspec $ do
 -- Yes, we can use QuickCheck:
 
 testTrClosRinR :: [(Int, Int)] -> Bool
-testTrClosRinR r = r `allIn` (trClos r)
+testTrClosRinR r = r `isInfixOf` (trClos r)
 
 testTransative :: [(Int, Int)] -> Bool
-testTransative r = (r @@ r) `allIn` r
+testTransative r = (r @@ r) `isInfixOf` r
 
 testTrClosRoRinR :: [(Int, Int)] -> Bool
 testTrClosRoRinR rNotUnique = testTransative $ trClos (nub rNotUnique)
 
 testTrClosIsMinimal :: [(Int, Int)] -> Bool
---testTrClosIsMinimal' r = [trClos r] == (filter testTransative $ filter (allIn r) (powerList $ trClos r))
+--testTrClosIsMinimal' r = [trClos r] == (filter testTransative $ filter (isInfixOf r) (powerList $ trClos r))
 testTrClosIsMinimal rNotUnique = (1==) $ length $ (filter testTransative (map (r ++) (powerList $ ((trClos r) \\ r))))
   where r = nub rNotUnique
-  
--- quickCheck testTrClosRinR
--- quickCheck testTrClosRoRinR
+
+
+-- copies from SetOrd.hs
+powerList :: [a] -> [[a]]
+powerList [] = [[]]
+powerList (x:xs) = (powerList xs) 
+                     ++ (map (x:) (powerList xs))
+
 
 -- Assignment 8. Bonus
 -- this function calls itself until x == f x, and returns the found x.
