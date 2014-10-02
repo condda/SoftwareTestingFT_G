@@ -342,7 +342,7 @@ should be minimal, so there shouldn't be a smaller subset thats also transative
 \begin_inset Formula $R^{+}$
 \end_inset
 
- and test if there is only one possibility which is transitive.
+ and tests if there is only one (R) that satisfies the transitivity condition.
 \end_layout
 
 \begin_layout LyX-Code
@@ -376,8 +376,7 @@ From these tests, we built an hspec function which tests the three properties
 \end_inset
 
 .
- This quickCheck worked correctly.
- This is shown in assignment 6.
+ All tests passed.
 \end_layout
 
 \end_body
