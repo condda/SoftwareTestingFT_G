@@ -137,11 +137,17 @@ testTrClos = hspec $ do
 -- Assignment 7.
 -- Yes, we can use QuickCheck:
 
+allIn :: Eq a => Rel a -> Rel a -> Bool
+allIn [] s = True
+allIn (r:rs) s = r `elem` s && rs `allIn` s
+
 testTrClosRinR :: [(Int, Int)] -> Bool
-testTrClosRinR r = r `isInfixOf` (trClos r)
+
+testTrClosRinR r = r `allIn` (trClos r)
+
 
 testTransitive :: [(Int, Int)] -> Bool
-testTransitive r = (r @@ r) `isInfixOf` r
+testTransitive r = (r @@ r) `allIn` r
 
 testTrClosRoRinR :: [(Int, Int)] -> Bool
 testTrClosRoRinR rNotUnique = testTransitive $ trClos (nub rNotUnique)

@@ -63,8 +63,70 @@
 Test Report Assignment week 4
 \end_layout
 
+\begin_layout Section*
+Assignment 4
+\end_layout
+
 \begin_layout Standard
-To test trClos we found on wikipedia that the 
+For assignment 4, we built quickCheck-testable tests:
+\end_layout
+
+\begin_layout LyX-Code
+testSimpleIntersect :: Set Int -> Set Int -> Bool
+\end_layout
+
+\begin_layout LyX-Code
+testSimpleIntersect a b = subSet (setIntersect a b) a && subSet (setIntersect
+ a b) b
+\end_layout
+
+\begin_layout Standard
+This function 
+\end_layout
+
+\begin_layout LyX-Code
+testSubsetUnion :: Set Int -> Set Int -> Bool
+\end_layout
+
+\begin_layout LyX-Code
+testSubsetUnion a b = subSet a (setUnion a b) && subSet b (setUnion a b)
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+testDifferenceSubset :: Set Int -> Set Int -> Bool
+\end_layout
+
+\begin_layout LyX-Code
+testDifferenceSubset a b = subSet (setDiff a b) a
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+testEquivalenceRelations :: Set Int -> Set Int -> Bool
+\end_layout
+
+\begin_layout LyX-Code
+testEquivalenceRelations a b = (setIntersect a b) == (setDiff (setUnion
+ a b) (setUnion (setDiff a b) (setDiff b a)))
+\end_layout
+
+\begin_layout Section*
+Assignment 7
+\end_layout
+
+\begin_layout Standard
+To test 
+\noun on
+trClos
+\noun default
+ we found on Wikipedia that it should hold, that: 
 \begin_inset Formula 
 \[
 R^{+}\Longleftrightarrow R\subseteq R^{+}\cap\, R^{+}is\: transative\,\cap\, R^{+}is\: minimal
@@ -72,11 +134,7 @@ R^{+}\Longleftrightarrow R\subseteq R^{+}\cap\, R^{+}is\: transative\,\cap\, R^{
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-In the workshop we also proved that, 
+In the workshop we also proved that,
 \end_layout
 
 \begin_layout Standard
@@ -87,23 +145,43 @@ R\circ R\subseteq R\Leftrightarrow R\, is\, transative
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-So we tested the following 3 things:
-\end_layout
-
-\begin_layout Standard
-That 
-\begin_inset Formula $R\subseteq R^{+}$
-\end_inset
-
-with the test method: 
+We tested this using the following three methods:
 \end_layout
 
 \begin_layout LyX-Code
+testTransitive :: [(Int, Int)] -> Bool
+\end_layout
 
+\begin_layout LyX-Code
+testTransitive r = (r @@ r) `isInfixOf` r
+\end_layout
+
+\begin_layout Standard
+Which tests 
+\begin_inset Formula $R\circ R\subseteq R\Leftrightarrow R\,\mbox{is\, transitive}$
+\end_inset
+
+:
+\end_layout
+
+\begin_layout LyX-Code
+testTrClosRoRinR :: [(Int, Int)] -> Bool
+\end_layout
+
+\begin_layout LyX-Code
+testTrClosRoRinR r = testTransitive $ trClos r 
+\end_layout
+
+\begin_layout Standard
+We then tested if 
+\begin_inset Formula $R$
+\end_inset
+
+ was in the transitive closure of 
+\begin_inset Formula $R$
+\end_inset
+
+:
 \end_layout
 
 \begin_layout LyX-Code
@@ -114,84 +192,43 @@ testTrClosRinR :: [(Int, Int)] -> Bool
 testTrClosRinR r = r `isInfixOf` (trClos r)
 \end_layout
 
-\begin_layout LyX-Code
-
-\end_layout
-
 \begin_layout Standard
-Than we tested if 
-\begin_inset Formula $R^{+}is\, transative$
-\end_inset
-
- this is so..
-\end_layout
-
-\begin_layout Standard
-testTransitive :: [(Int, Int)] -> Bool
-\end_layout
-
-\begin_layout Standard
-testTransitive r = (r @@ r) `isInfixOf` r
-\end_layout
-
-\begin_layout Standard
-testTrClosRoRinR :: [(Int, Int)] -> Bool
-\end_layout
-
-\begin_layout Standard
-testTrClosRoRinR rNotUnique = testTransitive $ trClos rNotUnique
-\end_layout
-
-\begin_layout Standard
-And it 
+And than 
 \begin_inset Formula $R^{+}$
 \end_inset
 
 should be minimal, so there shouldn't be a smaller subset thats also transative
- and contains 
-\end_layout
+ and contains R, we solved this with an 
+\begin_inset Formula $O(2^{n})$
+\end_inset
 
-\begin_layout Standard
-We test this based on the following assumption from the workshop:
-\end_layout
+ time test function, which basicly creates al the possible powerLists of
+ 
+\begin_inset Formula $R^{+}.$
+\end_inset
 
-\begin_layout Standard
-From this, we designed the function 
-\noun on
-testTrClos
-\noun default
-:
+
 \end_layout
 
 \begin_layout LyX-Code
-testTrClos :: [(Int, Int)] -> Bool
+
 \end_layout
 
 \begin_layout LyX-Code
-testTrClos rNotUnique = (r @@ r) `allIn` (trClos r)
+testTrClosIsMinimal :: [(Int, Int)] -> Bool
 \end_layout
 
 \begin_layout LyX-Code
-  where r = nub rNotUnique
-\end_layout
+testTrClosIsMinimal rNotUnique = (1==) $ length $ (filter   testTransitive
+ (map (r ++) (powerList $ ((trClos r) 
+\backslash
 
-\begin_layout Standard
-Here, the input of a random generator is converted to a unique set of elements
- (yet, still represented as a list), after which the stated property is
- tested.
- This function can be tested by QuickCheck using:
+\backslash
+ r))))     where r = nub rNotUnique
 \end_layout
 
 \begin_layout LyX-Code
-quickCheck testTrClos
-\end_layout
 
-\begin_layout Standard
-Which returned 
-\noun on
-True
-\noun default
-.
 \end_layout
 
 \end_body
