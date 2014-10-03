@@ -107,34 +107,5 @@ check5Sudoku = do [r] <- rsolveNs [emptyNwith5EmptyBlocks]
                   return $ uniqueSol r
 
 -- Assignment 4.
-consistentNrc s = and $
-                  [ rowInjective s r |  r <- positions ]
-                   ++
-                  [ colInjective s c |  c <- positions ]
-                   ++
-                  [ subgridInjective s (r,c) | 
-                       r <- [1,4,7], c <- [1,4,7]]
-                   ++
-                  [ subgridInjective s (r,c) | 
-                       r <- [2,6], c <- [2,6]]
-
-initNodeNrc :: Grid -> [Node]
-initNodeNrc gr = let s = grid2sud gr in 
-              if (not . consistentNrc) s then [] 
-              else [(s, constraints s)]
-
-solveAndShowNrc :: Grid -> IO()
-solveAndShowNrc gr = solveShowNs (initNodeNrc gr)
-
-nrcExample :: Grid
-nrcExample = [[0,0,0,3,0,0,0,0,0],
-              [0,0,0,7,0,0,3,0,0],
-              [2,0,0,0,0,0,0,0,8],
-              [0,0,6,0,0,5,0,0,0],
-              [0,9,1,6,0,0,0,0,0],
-              [3,0,0,0,7,1,2,0,0],
-              [0,0,0,0,0,0,0,3,1],
-              [0,8,0,0,4,0,0,0,0],
-              [0,0,2,0,0,0,0,0,0]]
-
+-- Assignment 4 is located in Lab5Nrc, using Week5Nrc.
 
