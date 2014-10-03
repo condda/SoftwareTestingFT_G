@@ -109,3 +109,26 @@ check5Sudoku = do [r] <- rsolveNs [emptyNwith5EmptyBlocks]
 -- Assignment 4 and 5.
 -- Assignment 4 is located in Lab5Nrc, using Week5Nrc.
 -- Time spent: 1 hour on assignment 4, which by accident also completed assignment 5.
+
+-- Assignment 6.
+--
+-- To develop a generator for easy/hard problems, first we need to take a look at
+-- what classifies a sudoku easy/hard by humans.
+--
+-- The paper proposes states that the most important factors on the difficulty are:
+--
+-- - Complexity of individual (logic) steps;
+-- - Structure of dependency among steps.
+--
+-- The paper presents a method that classifies Sudoku puzzles using a combination of
+-- four different already existing classification methods.
+--
+-- One (easy) way to generate easy/hard puzzles is to implement this (very complex) classifier and generate
+-- puzzles until the classifier classifies the found puzzle as either easy or hard.
+--
+-- A simpler, yet, probably not as reliable classifier, would be a classifier that classifies
+-- a Sudoku puzzle as easy if it does not require backtracking to solve, and only
+-- requires a set of proven trivial Sudoku techniques, and otherwise as hard.
+--
+-- Generating different puzzles until the classifier either marks it easy or hard, will then
+-- result in either a hard or an easy puzzle.

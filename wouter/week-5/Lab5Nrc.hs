@@ -17,7 +17,7 @@ nrcExample = [[0,0,0,3,0,0,0,0,0],
               [0,8,0,0,4,0,0,0,0],
               [0,0,2,0,0,0,0,0,0]]
 
--- Assignment 5 and 6.
+-- Assignment 4 and 5.
 --
 -- (See Week5Nrc.hs)
 -- The new formal constraint is that all subgrids [2..4]x[2..4] and [6..8]x[6..8] have to be injective.
