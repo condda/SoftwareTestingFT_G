@@ -106,6 +106,6 @@ generateSudoku5EmptyBlocks = do [r] <- rsolveNs [emptyNwith5EmptyBlocks]
 check5Sudoku = do [r] <- rsolveNs [emptyNwith5EmptyBlocks]
                   return $ uniqueSol r
 
--- Assignment 4.
+-- Assignment 4 and 5.
 -- Assignment 4 is located in Lab5Nrc, using Week5Nrc.
-
+-- Time spent: 1 hour on assignment 4, which by accident also completed assignment 5.
