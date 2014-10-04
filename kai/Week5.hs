@@ -124,7 +124,7 @@ type Node = (Sudoku,[Constraint])
 showNode :: Node -> IO()
 showNode = showSudoku . fst
 
-solved  :: Node -> Bool
+solved :: Node -> Bool
 solved = null . snd
 
 extendNode :: Node -> Constraint -> [Node]

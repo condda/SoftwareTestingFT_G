@@ -29,9 +29,7 @@ test1 = hspec $ do
 
 
 ------2
-isUniqueWith n x = (not $ uniqueSol $ eraseN n x )
-	
-all_posible_positions = [(x,y) | x <- positions, y <- positions]
+isUniqueWith n x = (not $ uniqueSol $ eraseN n x)
 
 is_minimal = do
 	node <- (rsolveNs [emptyN])
@@ -41,7 +39,7 @@ is_minimal = do
 isMinimal :: Node -> Bool
 isMinimal n = uniqueSol n && all (isUniqueWith n) (filledPositions $ fst n)
 
-
+-- 3
 eraseBlock :: Node -> (Row, Column) -> Node
 eraseBlock n (r,c) = minimalize n [(x,y) | x <- bl (3*r), y <- bl (3*c)]
 
@@ -61,6 +59,34 @@ emptyNwithEmptyBlocks = (\ _ -> 0, (block (2,1)) ++ (block (3,1)) ++ (block (1,2
 
 mai3 = do [r] <- rsolveNs [emptyNwithEmptyBlocks]
           showNode r
+
+
+singleton (_, _, [_]) = True
+singleton (_, _, _) = False
+
+
+
+countNakedSingles :: Node -> Int
+countNakedSingles (s,c) = length $ filter singleton c
+
+
+stats :: Node -> [Int]
+stats n
+  | solved n = []
+  | otherwise = (countNakedSingles n):stats(head $ succNode n)
+
+--countHiddenSingles :: Node -> Int
+--countHiddenSingles (s,c) = filter (bla c) c
+
+
+--bla :: [Constraint] -> Constraint -> Bool
+
+--bla xs c = 
+--freeInRow s r = 
+--  freeInSeq [ s (r,i) | i <- positions  ]
+
+
+
 --bla :: IO ()
 --main = hspec $ do
 --  describe "Prelude" $ do
