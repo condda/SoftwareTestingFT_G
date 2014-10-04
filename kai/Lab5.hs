@@ -7,6 +7,7 @@ import Test.Hspec
 import Test.QuickCheck
 
 
+
 --test_for_random_sudoku = do
 --  node <- genRandomSudoku
 --  return $ all null (map (\x -> freeInRow (fst node) x) positions)
@@ -65,25 +66,40 @@ singleton (_, _, [_]) = True
 singleton (_, _, _) = False
 
 
+singleton2 [_] = True
+singleton2 _ = False
+
 
 countNakedSingles :: Node -> Int
 countNakedSingles (s,c) = length $ filter singleton c
 
 
-stats :: Node -> [Int]
-stats n
-  | solved n = []
-  | otherwise = (countNakedSingles n):stats(head $ succNode n)
+countHiddenSingles :: Node -> Int
+countHiddenSingles (s,c) = length $ filter (hiddenSingle c) c
 
---countHiddenSingles :: Node -> Int
---countHiddenSingles (s,c) = filter (bla c) c
+
+hiddenSingle :: [Constraint] -> Constraint -> Bool
+
+hiddenSingle c p@(_,_,vs) = singleton2 $ vs `intersect` ( map head (filter singleton2 $ group $ sort $ blaRow c p))
+
 
 
 --bla :: [Constraint] -> Constraint -> Bool
+--bla xs (r,c,xs) = any (row) xs
 
---bla xs c = 
---freeInRow s r = 
---  freeInSeq [ s (r,i) | i <- positions  ]
+blaRow :: [Constraint] -> Constraint -> [Int]
+blaRow [] _ = []
+blaRow ((r',c',vs):ys) (r,c,xs)
+	| r' == r = vs ++ (blaRow ys (r,c,xs))
+	| otherwise = (blaRow ys (r,c,xs))
+
+
+
+
+stats :: Node -> [Int]
+stats n
+  | solved n = []
+  | otherwise = (countNakedSingles n + countHiddenSingles n):stats(head $ succNode n)
 
 
 
