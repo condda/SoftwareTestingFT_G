@@ -69,6 +69,7 @@ mai3 = do [r] <- rsolveNs [emptyNwithEmptyBlocks]
 singleton (_, _, [_]) = True
 singleton (_, _, _) = False
 
+
 singleton2 [_] = True
 singleton2 _ = False
 
@@ -79,28 +80,28 @@ countHiddenSingles :: Node -> Int
 countHiddenSingles (s,c) = length $ filter (hiddenSingle c) c
 
 hiddenSingle :: [Constraint] -> Constraint -> Bool
-hiddenSingle c p@(_,_,vs) = singleton2 $ vs `intersect` ((from_one_to_other $ blaRow c p) `union` (from_one_to_other $ blaCol c p) `union` (from_one_to_other $ blaSubgrid c p))
+hiddenSingle c p@(_,_,vs) = singleton2 $ vs `intersect` ((from_one_to_other $ valuesForRow c p) `union` (from_one_to_other $ valuesForCol c p) `union` (from_one_to_other $ valuesForSubgrid c p))
 
 from_one_to_other :: [Int] -> [Int]
 from_one_to_other xs = map head $ filter singleton2 $ group $ sort xs
 
-blaRow :: [Constraint] -> Constraint -> [Int]
-blaRow [] _ = []
-blaRow ((r',c',vs):ys) (r,c,xs)
-	| r' == r = vs ++ (blaRow ys (r,c,xs))
-	| otherwise = (blaRow ys (r,c,xs))
+valuesForRow :: [Constraint] -> Constraint -> [Int]
+valuesForRow [] _ = []
+valuesForRow ((r',c',vs):ys) (r,c,xs)
+	| r' == r = vs ++ (valuesForRow ys (r,c,xs))
+	| otherwise = (valuesForRow ys (r,c,xs))
 
-blaCol :: [Constraint] -> Constraint -> [Int]
-blaCol [] _ = []
-blaCol ((r',c',vs):ys) (r,c,xs)
-	| c' == c = vs ++ (blaRow ys (r,c,xs))
-	| otherwise = (blaRow ys (r,c,xs))
+valuesForCol :: [Constraint] -> Constraint -> [Int]
+valuesForCol [] _ = []
+valuesForCol ((r',c',vs):ys) (r,c,xs)
+	| c' == c = vs ++ (valuesForRow ys (r,c,xs))
+	| otherwise = (valuesForRow ys (r,c,xs))
 
-blaSubgrid :: [Constraint] -> Constraint -> [Int]
-blaSubgrid [] _ = []
-blaSubgrid ((r',c',vs):ys) (r,c,xs)
-	| elem r' (bl r) && elem c' (bl c) = vs ++ (blaRow ys (r,c,xs))
-	| otherwise = (blaRow ys (r,c,xs))
+valuesForSubgrid :: [Constraint] -> Constraint -> [Int]
+valuesForSubgrid [] _ = []
+valuesForSubgrid ((r',c',vs):ys) (r,c,xs)
+	| elem r' (bl r) && elem c' (bl c) = vs ++ (valuesForRow ys (r,c,xs))
+	| otherwise = (valuesForRow ys (r,c,xs))
 
 
 stats :: Node -> [Int]
@@ -110,7 +111,7 @@ stats n
 
 
 
---bla :: IO ()
+--valuesFor :: IO ()
 --main = hspec $ do
 --  describe "Prelude" $ do
 --    describe "read" $ do
