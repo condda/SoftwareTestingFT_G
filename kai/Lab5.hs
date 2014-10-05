@@ -79,6 +79,9 @@ countNakedSingles (s,c) = length $ filter singleton c
 countHiddenSingles :: Node -> Int
 countHiddenSingles (s,c) = length $ filter (hiddenSingle c) c
 
+countSingles :: Node -> Int
+countSingles (s,c) = length $ filter (\x -> (hiddenSingle c x) || (singleton x)) c
+
 hiddenSingle :: [Constraint] -> Constraint -> Bool
 hiddenSingle c p@(_,_,vs) = singleton2 $ vs `intersect` ((from_one_to_other $ valuesForRow c p) `union` (from_one_to_other $ valuesForCol c p) `union` (from_one_to_other $ valuesForSubgrid c p))
 
@@ -107,9 +110,11 @@ valuesForSubgrid ((r',c',vs):ys) (r,c,xs)
 stats :: Node -> [Int]
 stats n
   | solved n = []
-  | otherwise = (countNakedSingles n + countHiddenSingles n):(stats $ head $ succNode n)
+  | otherwise = (countSingles n):(stats $ head $ succNode n)
 
 
+
+average xs = realToFrac (sum xs) / genericLength xs
 
 --valuesFor :: IO ()
 --main = hspec $ do
