@@ -158,26 +158,38 @@ freeAtPos s (r,c) =
 injective :: Eq a => [a] -> Bool
 injective xs = nub xs == xs
 
-rowInjective :: Sudoku -> Row -> Bool
-rowInjective s r = injective vs where 
-   vs = filter (/= 0) [ s (r,i) | i <- positions ]
+rowInjective :: Sudoku -> [Int] -> Row -> Bool
+rowInjective s poss r = injective vs where 
+   vs = filter (/= 0) [ s (r,i) | i <- poss ]
 
-colInjective :: Sudoku -> Column -> Bool
-colInjective s c = injective vs where 
-   vs = filter (/= 0) [ s (i,c) | i <- positions ]
+colInjective :: Sudoku -> [Int] -> Column -> Bool
+colInjective s poss c = injective vs where 
+   vs = filter (/= 0) [ s (i,c) | i <- poss ]
 
 subgridInjective :: Sudoku -> (Row,Column) -> Bool
 subgridInjective s (r,c) = injective vs where 
    vs = filter (/= 0) (subGrid s (r,c))
 
+rowsAndColsInjective s possR possC =
+  [ rowInjective s possC r  | r <- possR] ++
+  [ colInjective s possR c  | c <- possC]
+
 consistent :: Sudoku -> Bool
-consistent s = True {- and $
-               [ rowInjective s r |  r <- positions ]
+consistent s = and $
+               rowsAndColsInjective s [1..9] [1..9]
                 ++
-               [ colInjective s c |  c <- positions ]
+               rowsAndColsInjective s [1..9] [13..21]
                 ++
-               [ subgridInjective s (r,c) | -- TODO
-                    r <- [1,4,7], c <- [1,4,7]]-}
+               rowsAndColsInjective s [13..21] [1..9]
+                ++
+               rowsAndColsInjective s [13..21] [13..21]
+                ++
+               rowsAndColsInjective s [7..15] [7..15]
+                ++
+               [ subgridInjective s (r,c) |
+                    r <- [1,4,7,10,13,16,19], c <- [1,4,7,10,13,16,19],
+                    r /= 10 || (c == 1 || c == 4 || c == 16 || c == 19),
+                    c /= 10 || (r == 1 || r == 4 || r == 16 || r == 19)]
 
 extend :: Sudoku -> ((Row,Column),Value) -> Sudoku
 extend = update
