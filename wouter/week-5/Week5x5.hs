@@ -1,4 +1,4 @@
-module Week5 where 
+module Week5x5 where 
 
 import Data.List
 import System.Random
@@ -10,7 +10,7 @@ type Grid   = [[Value]]
 
 positions, values :: [Int]
 positions = [1..21]
-values    = [1..21] 
+values    = [1..9] 
 
 blocks :: [[Int]]
 blocks = [[1..3],[4..6],[7..9],[10..12],[13..15],[16..18],[19..21]]
@@ -127,21 +127,32 @@ subGrid s (r,c) =
 freeInSeq :: [Value] -> [Value]
 freeInSeq seq = values \\ seq 
 
-freeInRow :: Sudoku -> Row -> [Value]
-freeInRow s r = 
-  freeInSeq [ s (r,i) | i <- positions  ]
+freeInRow :: Sudoku -> (Row,Column) -> [Value]
+freeInRow s (r,c)
+  -- Overlaps
+  -- Top:
+  | c>= 7 && c<= 9   && ((r>= 7 && r<= 9) || (r>=13 && r<=15)) = freeInSeq [ s(r,i) | i <- [1..15] ]
+  -- Bottom:
+  | c>= 13 && c<= 15 && ((r>= 7 && r<= 9) || (r>=13 && r<=15)) = freeInSeq [ s(r,i) | i <- [7..21] ]
+  -- Partial Sudokus
+  -- Middle
+  | c>=7 && c<=15 && r>=7 && r<=15 = freeInSeq [ s(r,i) | i <- [7..15] ]
+  -- Top
+  | c<=9 = freeInSeq [ s(r,i) | i <- [1..9] ]
+  -- Bottom
+  | c>=13 = freeInSeq [ s(r,i) | i <- [13..21] ]
+  | otherwise = error $ "Error: col " ++ (show c) ++ ", row" ++ (show r)
 
-freeInColumn :: Sudoku -> Column -> [Value]
-freeInColumn s c = 
-  freeInSeq [ s (i,c) | i <- positions ]
+freeInColumn :: Sudoku -> (Row,Column) -> [Value]
+freeInColumn s (r,c) = freeInRow (\ (r,c) -> s (c,r)) (c,r)
 
 freeInSubgrid :: Sudoku -> (Row,Column) -> [Value]
 freeInSubgrid s (r,c) = freeInSeq (subGrid s (r,c))
 
 freeAtPos :: Sudoku -> (Row,Column) -> [Value]
 freeAtPos s (r,c) = 
-  (freeInRow s r) 
-   `intersect` (freeInColumn s c) 
+  (freeInRow s (r,c)) 
+   `intersect` (freeInColumn s (r,c)) 
    `intersect` (freeInSubgrid s (r,c)) 
 
 injective :: Eq a => [a] -> Bool
@@ -160,13 +171,13 @@ subgridInjective s (r,c) = injective vs where
    vs = filter (/= 0) (subGrid s (r,c))
 
 consistent :: Sudoku -> Bool
-consistent s = and $
+consistent s = True {- and $
                [ rowInjective s r |  r <- positions ]
                 ++
                [ colInjective s c |  c <- positions ]
                 ++
                [ subgridInjective s (r,c) | -- TODO
-                    r <- [1,4,7], c <- [1,4,7]]
+                    r <- [1,4,7], c <- [1,4,7]]-}
 
 extend :: Sudoku -> ((Row,Column),Value) -> Sudoku
 extend = update
@@ -194,12 +205,20 @@ length3rd :: (a,b,[c]) -> (a,b,[c]) -> Ordering
 length3rd (_,_,zs) (_,_,zs') = 
   compare (length zs) (length zs')
 
+sameSudoku (r,c) (x,y)
+  | r <= 9 && x <= 9 && c <= 9 && y <= 9 = True
+  | r >= 13 && x >= 13 && c <= 9 && y <= 9 = True
+  | r <= 9 && x <= 9 && c >= 13 && y >= 13 = True
+  | r >= 13 && x >= 13 && c >= 13 && y >= 13 = True
+  | r >= 7 && x >= 7 && r <= 15 && x <= 15 && c >= 7 && y >= 7 && c <= 15 && y <= 15 = True
+  | otherwise = False
+
 prune :: (Row,Column,Value) 
       -> [Constraint] -> [Constraint]
 prune _ [] = []
 prune (r,c,v) ((x,y,zs):rest)
-  | r == x = (x,y,zs\\[v]) : prune (r,c,v) rest
-  | c == y = (x,y,zs\\[v]) : prune (r,c,v) rest
+  | sameSudoku (r,c) (x,y) && r == x = (x,y,zs\\[v]) : prune (r,c,v) rest
+  | sameSudoku (r,c) (x,y) && c == y = (x,y,zs\\[v]) : prune (r,c,v) rest
   | sameblock (r,c) (x,y) = 
         (x,y,zs\\[v]) : prune (r,c,v) rest
   | otherwise = (x,y,zs) : prune (r,c,v) rest
@@ -215,7 +234,8 @@ initNode gr = let s = grid2sud gr in
 openPositions :: Sudoku -> [(Row,Column)]
 openPositions s = [ (r,c) | r <- positions,  
                             c <- positions,
-                            (r <= 9 || r > 12) || (c <= 9 || c > 12) || (r > 9 && r <= 12 && c > 9 && c <= 12),
+                            ((r <= 9 || r > 12) && (c <= 9 || c > 12)) -- outside sudokus.
+                            || (r > 6 && r <= 15 && c > 6 && c <= 15), -- middle sudoku.
                             s (r,c) == 0 ]
 
 constraints :: Sudoku -> [Constraint] 
@@ -254,61 +274,6 @@ solveAndShow gr = solveShowNs (initNode gr)
 
 solveShowNs :: [Node] -> IO()
 solveShowNs = sequence_ . fmap showNode . solveNs
-
-example1 :: Grid
-example1 = [[5,3,0,0,7,0,0,0,0],
-            [6,0,0,1,9,5,0,0,0],
-            [0,9,8,0,0,0,0,6,0],
-            [8,0,0,0,6,0,0,0,3],
-            [4,0,0,8,0,3,0,0,1],
-            [7,0,0,0,2,0,0,0,6],
-            [0,6,0,0,0,0,2,8,0],
-            [0,0,0,4,1,9,0,0,5],
-            [0,0,0,0,8,0,0,7,9]]
-
-example2 :: Grid
-example2 = [[0,3,0,0,7,0,0,0,0],
-            [6,0,0,1,9,5,0,0,0],
-            [0,9,8,0,0,0,0,6,0],
-            [8,0,0,0,6,0,0,0,3],
-            [4,0,0,8,0,3,0,0,1],
-            [7,0,0,0,2,0,0,0,6],
-            [0,6,0,0,0,0,2,8,0],
-            [0,0,0,4,1,9,0,0,5],
-            [0,0,0,0,8,0,0,7,9]]
-
-example3 :: Grid
-example3 = [[1,0,0,0,3,0,5,0,4],
-            [0,0,0,0,0,0,0,0,3],
-            [0,0,2,0,0,5,0,9,8], 
-            [0,0,9,0,0,0,0,3,0],
-            [2,0,0,0,0,0,0,0,7],
-            [8,0,3,0,9,1,0,6,0],
-            [0,5,1,4,7,0,0,0,0],
-            [0,0,0,3,0,0,0,0,0],
-            [0,4,0,0,0,9,7,0,0]]
-
-example4 :: Grid
-example4 = [[1,2,3,4,5,6,7,8,9],
-            [2,0,0,0,0,0,0,0,0],
-            [3,0,0,0,0,0,0,0,0],
-            [4,0,0,0,0,0,0,0,0],
-            [5,0,0,0,0,0,0,0,0],
-            [6,0,0,0,0,0,0,0,0],
-            [7,0,0,0,0,0,0,0,0],
-            [8,0,0,0,0,0,0,0,0],
-            [9,0,0,0,0,0,0,0,0]]
-
-example5 :: Grid
-example5 = [[1,0,0,0,0,0,0,0,0],
-            [0,2,0,0,0,0,0,0,0],
-            [0,0,3,0,0,0,0,0,0],
-            [0,0,0,4,0,0,0,0,0],
-            [0,0,0,0,5,0,0,0,0],
-            [0,0,0,0,0,6,0,0,0],
-            [0,0,0,0,0,0,7,0,0],
-            [0,0,0,0,0,0,0,8,0],
-            [0,0,0,0,0,0,0,0,9]]
 
 emptyN :: Node
 emptyN = (\ _ -> 0,constraints (\ _ -> 0))
