@@ -132,3 +132,17 @@ check5Sudoku = do [r] <- rsolveNs [emptyNwith5EmptyBlocks]
 --
 -- Generating different puzzles until the classifier either marks it easy or hard, will then
 -- result in either a hard or an easy puzzle.
+
+-- THE BONUS ASSIGNMENTS, BOTH THE SOLVER AND THE GENERATOR FOR THE SUDOKU:
+--
+--    GGG GGG
+--    GGG GGG
+--    GGGGGGG
+--      GGG
+--    GGGGGGG
+--    GGG GGG
+--    GGG GGG
+--
+-- Where G is a subgrid.
+--
+-- CAN BE FOUND IN Week5x5.hs!!!!

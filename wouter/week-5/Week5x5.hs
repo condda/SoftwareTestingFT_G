@@ -1,3 +1,30 @@
+-- During the lecture the teacher
+-- stated that the bonus assignments were:
+-- 1. Create a Sudoku generator for a special kind of Sudoku:
+--    GGG GGG
+--    GGG GGG
+--    GGGGGGG
+--      GGG
+--    GGGGGGG
+--    GGG GGG
+--    GGG GGG
+--
+-- Where G is a subgrid.
+--
+-- 2. Create a Sudoku solver.
+--
+-- Both aspects work. Both can be demonstrated using the respective
+-- functions:
+-- - generateSudoku
+-- - solveExSudoku
+-- Due to the fact that the minimization process takes very long,
+-- we created a simple example which is basically a generated Sudoku
+-- but with a few fields removed, that is not minimal, but is consistent.
+-- Although this may not be a very strong example, the fact alone that
+-- the generation of Sudokus is done using rsolveNs [emptyN] should already
+-- prove the fact that both the Generator and the Solver work, because
+-- the Generator works by SOLVING an empty Sudoku.
+
 module Week5x5 where 
 
 import Data.List
