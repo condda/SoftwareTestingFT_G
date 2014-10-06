@@ -214,7 +214,8 @@ initNode gr = let s = grid2sud gr in
 
 openPositions :: Sudoku -> [(Row,Column)]
 openPositions s = [ (r,c) | r <- positions,  
-                            c <- positions, 
+                            c <- positions,
+                            (r <= 9 || r > 12) || (c <= 9 || c > 12) || (r > 9 && r <= 12 && c > 9 && c <= 12),
                             s (r,c) == 0 ]
 
 constraints :: Sudoku -> [Constraint] 
