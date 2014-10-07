@@ -64,22 +64,13 @@ testSudokuSolverAndGenerator = hspec $ do
 solvedAndConsistent x = solved x && consistent (fst x)
 
 -- Assignment 2.
--- TODO: REPORT!!!!!!!!!!!!!!!!!!
-isUniqueWith n x = (not $ uniqueSol $ eraseN n x )
-
--- The function testIsMinimal tests if a node is minimal for n random cases.
-testIsMinimal 1 = do
-	node <- (rsolveNs [emptyN])
-	node2 <- genProblem (head $ node)
-	return $ isMinimal node2
-
-testIsMinimal n = do
-        x <- testIsMinimal (n - 1)
-        y <- testIsMinimal 1
-        return $ x && y
+isNotUniqueWithout n x = (not $ uniqueSol $ eraseN n x )
 
 isMinimal :: Node -> Bool
-isMinimal n = uniqueSol n && all (isUniqueWith n) (filledPositions $ fst n)
+isMinimal n = uniqueSol n && all (isNotUniqueWithout n) (filledPositions $ fst n)
+
+-- The test was already defined in the first assignment, and can be checked using:
+-- quickCheck prop_min
 
 -- Assignment 3.
 block :: (Int, Int) -> [Constraint]
