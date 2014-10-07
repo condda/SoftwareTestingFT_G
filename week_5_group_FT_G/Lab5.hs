@@ -11,9 +11,12 @@ import Test.QuickCheck.Monadic (assert, monadicIO, pick, pre, run)
 --
 -- There are several ways to use QuickCheck for testing a Sudoku generator and solver.
 --
--- We need to use the QuickCheck Monadic library for testing the solver and the generator,
+-- However, unless we want to change the code of the Sudoku assignment,
+-- we need to use the QuickCheck Monadic library for testing the solver and the generator,
 -- because the generator uses the IO monad, and to test the solver with arbitrary
 -- Sudokus, Sudokus need to be generated.
+
+-- The following functions represent the QuickCheck-checkable properties:
 
 -- Test if every generated Sudoku is consistent.
 prop_consistent :: Property
@@ -42,11 +45,8 @@ prop_min = monadicIO $  do [r] <- run $ rsolveNs [emptyN]
                            p <- run $ genProblem r
                            assert $ isMinimal p
 
-testRandomSudoku = do
-  node <- genRandomSudoku
-  return $ consistent $ fst node
-
 -- Specifications for Random Sudoku Generator.
+-- Note: may take quite some time.
 testSudokuSolverAndGenerator :: IO ()
 testSudokuSolverAndGenerator = hspec $ do
   describe "genRandomSudoku" $ do
@@ -55,31 +55,16 @@ testSudokuSolverAndGenerator = hspec $ do
   describe "genProblem" $ do
     it "returns a Sudoku for which the solution is always equal to the original" $ prop_same
     it "returns a minimal Sudoku" $ prop_min
-
-solvedAndConsistent x = solved x && consistent (fst x)
-
--- Specifications for Sudoku Solver
-testSolveNs :: IO()
-testSolveNs = hspec $ do
   describe "solveNs" $ do
-    it "should be able to examples 1..3" $ do
+    it "should be able to solve examples 1..3" $ do
       all (\t -> t) [(solved $ head $ solveNs $ initNode s) | s <- [example1,example2,example3]] `shouldBe` True
-
-    it "should be able to solve a randomly generated problem." $ do
-      node <- genRandomSudoku
-      s <- genProblem node
-      (solvedAndConsistent $ head $ solveNs $ [node]) `shouldBe` True
-
     it "should return an empty list of nodes for insolvable sudokus." $ do
       length (solveNs $ initNode example4) `shouldBe` 0
 
--- It is possible to write tests for QuickCheck, by implementing
--- an instance of Arbitrary which generates random Sudoku puzzles, and
--- apply property tests to them.
-
-
+solvedAndConsistent x = solved x && consistent (fst x)
 
 -- Assignment 2.
+-- TODO: REPORT!!!!!!!!!!!!!!!!!!
 isUniqueWith n x = (not $ uniqueSol $ eraseN n x )
 
 -- The function testIsMinimal tests if a node is minimal for n random cases.
@@ -122,11 +107,41 @@ generateSudoku5EmptyBlocks = do [r] <- rsolveNs [emptyNwith5EmptyBlocks]
 -- In order to test this, we wrote a function that tests whether
 -- the results of the version with 5 empty blocks (and thus the hardest) is solvable
 -- using a unique solution:
-check5Sudoku = do [r] <- rsolveNs [emptyNwith5EmptyBlocks]
-                  return $ uniqueSol r
+
+prop_sudoku_3empty_consistent_unique :: Property
+prop_sudoku_3empty_consistent_unique = monadicIO $ do [r] <- run $ rsolveNs [emptyNwith3EmptyBlocks]
+                                                      assert $ uniqueSol r
+
+prop_sudoku_4empty_consistent_unique :: Property
+prop_sudoku_4empty_consistent_unique = monadicIO $ do [r] <- run $ rsolveNs [emptyNwith4EmptyBlocks]
+                                                      assert $ uniqueSol r
+
+prop_sudoku_5empty_consistent_unique :: Property
+prop_sudoku_5empty_consistent_unique = monadicIO $ do [r] <- run $ rsolveNs [emptyNwith5EmptyBlocks]
+                                                      assert $ uniqueSol r
+
+test3_4_5_emptyBlocksSudokus = hspec $ do
+  describe "emptyNwith3EmptyBlocks" $ do
+    it "should return a unique solution while being consistent when solved." $ prop_sudoku_3empty_consistent_unique
+  describe "emptyNwith4EmptyBlocks" $ do
+    it "should return a unique solution while being consistent when solved." $ prop_sudoku_3empty_consistent_unique
+  describe "emptyNwith5EmptyBlocks" $ do
+    it "should return a unique solution while being consistent when solved." $ prop_sudoku_3empty_consistent_unique
+
 
 -- Assignment 4 and 5.
--- Assignment 4 is located in Lab5Nrc, using Week5Nrc.
+-- Assignment 4 is located in Lab5Nrc.hs, using Week5Nrc.hs.
+-- The formal constraint:
+--
+-- for each location (r,c) in Sudoku S:
+--   r should be injective
+--   c should be injective
+--   subgrid (r,c) should be injective
+--   nrcSubgrid (r,c) should be injective,
+--
+-- where subgrid consists of the grids [[1..3], [4..6], [7..9]]^2
+-- and nrcSubgrid consists of the grids [[2..4], [6..8]]^2
+--
 -- Time spent: 1 hour on assignment 4, which by accident also completed assignment 5.
 
 -- Assignment 6.
