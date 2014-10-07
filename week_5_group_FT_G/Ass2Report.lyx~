@@ -1,0 +1,146 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section*
+Test report assignment 2
+\end_layout
+
+\begin_layout Standard
+We tested if all generated problems were minimal by creating a function
+ 
+\emph on
+isMinimal,
+\emph default
+ which tries to remove one 
+\emph on
+filled
+\emph default
+ number at a time and checks if it is still a unique function.
+ If, for all cases, this is false, but for the case where no number is removed,
+ then we can conclude that the solution is 
+\emph on
+minimal
+\emph default
+, because for each removed number, the solution is not unique anymore.
+\end_layout
+
+\begin_layout Standard
+For the testing of the specifications using QuickCheck in the first assignment,
+ we already defined the test for this function:
+\end_layout
+
+\begin_layout LyX-Code
+prop_min = monadicIO $  do [r] <- run $ rsolveNs [emptyN]
+\end_layout
+
+\begin_layout LyX-Code
+                           p <- run $ genProblem r
+\end_layout
+
+\begin_layout LyX-Code
+                           assert $ isMinimal p
+\end_layout
+
+\begin_layout Standard
+which asserts that for each arbitrary problem, the 
+\emph on
+isMinimal
+\emph default
+-property holds.
+\end_layout
+
+\begin_layout Standard
+The isMinimal function is defined as following:
+\end_layout
+
+\begin_layout LyX-Code
+isMinimal n = uniqueSol n && all (isNotUniqueWithout n) (filledPositions
+ $ fst n)
+\end_layout
+
+\begin_layout Standard
+Thus it checks that the original 
+\noun on
+Node
+\noun default
+ n is unique, and for all filled positions, when removed, is not unique
+ anymore, using the function 
+\noun on
+isNotUniqueWithout n x
+\noun default
+, which is defined as following:
+\end_layout
+
+\begin_layout LyX-Code
+ isNotUniqueWithout n x = (not $ uniqueSol $ eraseN n x )
+\end_layout
+
+\begin_layout Standard
+The function eraseN removes the value at location x and then tests if the
+ uniqueness constraint still holds.
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\end_body
+\end_document
