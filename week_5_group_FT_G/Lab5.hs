@@ -136,6 +136,80 @@ test3_4_5_emptyBlocksSudokus = hspec $ do
 -- Time spent: 1 hour on assignment 4, which by accident also completed assignment 5.
 
 -- Assignment 6.
+
+
+
+
+singleton (_, _, [_]) = True
+singleton (_, _, _) = False
+
+
+singleton2 [_] = True
+singleton2 _ = False
+
+countNakedSingles :: Node -> Int
+countNakedSingles (s,c) = length $ filter singleton c
+
+countHiddenSingles :: Node -> Int
+countHiddenSingles (s,c) = length $ filter (hiddenSingle c) c
+
+countSingles :: Node -> Int
+countSingles (s,c) = length $ filter (\x -> (hiddenSingle c x) || (singleton x)) c
+
+hiddenSingle :: [Constraint] -> Constraint -> Bool
+hiddenSingle c p@(_,_,vs) = singleton2 $ vs `intersect` ((from_one_to_other $ valuesForRow c p) `union` (from_one_to_other $ valuesForCol c p) `union` (from_one_to_other $ valuesForSubgrid c p))
+
+from_one_to_other :: [Int] -> [Int]
+from_one_to_other xs = map head $ filter singleton2 $ group $ sort xs
+
+valuesForRow :: [Constraint] -> Constraint -> [Int]
+valuesForRow [] _ = []
+valuesForRow ((r',c',vs):ys) (r,c,xs)
+  | r' == r = vs ++ (valuesForRow ys (r,c,xs))
+  | otherwise = (valuesForRow ys (r,c,xs))
+
+valuesForCol :: [Constraint] -> Constraint -> [Int]
+valuesForCol [] _ = []
+valuesForCol ((r',c',vs):ys) (r,c,xs)
+  | c' == c = vs ++ (valuesForRow ys (r,c,xs))
+  | otherwise = (valuesForRow ys (r,c,xs))
+
+valuesForSubgrid :: [Constraint] -> Constraint -> [Int]
+valuesForSubgrid [] _ = []
+valuesForSubgrid ((r',c',vs):ys) (r,c,xs)
+  | elem r' (bl r) && elem c' (bl c) = vs ++ (valuesForRow ys (r,c,xs))
+  | otherwise = (valuesForRow ys (r,c,xs))
+
+
+stats :: Node -> [Int]
+stats n
+  | solved n = []
+  | otherwise = (countSingles n):(stats $ head $ succNode n)
+
+average xs = realToFrac (sum xs) / genericLength xs
+
+
+classivie :: Node -> Int
+classivie n = if x > 15 then 15 else (if x < 10 then 15 else 10)
+              where x = average $ stats n
+
+easy_one :: IO ()
+easy_one = do
+  node <- genRandomSudoku
+  if (classivie node) == 10 then showNode node else easy_one
+
+
+hard_one :: IO ()
+hard_one = do
+  node <- genRandomSudoku
+  if (classivie node) == 10 then showNode node else hard_one
+
+
+
+
+
+
+
 --
 -- To develop a generator for easy/hard problems, first we need to take a look at
 -- what classifies a sudoku easy/hard by humans.
