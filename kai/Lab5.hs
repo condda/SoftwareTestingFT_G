@@ -112,10 +112,22 @@ average xs = realToFrac (sum xs) / genericLength xs
 
 
 classivie :: Node -> Int
-classivie n = if x > 15 then 15 else 10
+classivie n = if x > 15 then 15 else (if x < 10 then 15 else 10)
               where x = average $ stats n
 
-              
+easy_one :: IO ()
+easy_one = do
+  node <- genRandomSudoku
+  if (classivie node) == 10 then showNode node else easy_one
+
+
+hard_one :: IO ()
+hard_one = do
+  node <- genRandomSudoku
+  if (classivie node) == 10 then showNode node else hard_one
+
+
+
 
 
 
