@@ -147,6 +147,8 @@ singleton (_, _, _) = False
 singleton2 [_] = True
 singleton2 _ = False
 
+
+-- count the number of naked singles in een node
 countNakedSingles :: Node -> Int
 countNakedSingles (s,c) = length $ filter singleton c
 
@@ -181,6 +183,8 @@ valuesForSubgrid ((r',c',vs):ys) (r,c,xs)
   | otherwise = (valuesForRow ys (r,c,xs))
 
 
+-- calculate the stats in a node
+
 stats :: Node -> [Int]
 stats n
   | solved n = []
@@ -189,6 +193,8 @@ stats n
 average xs = realToFrac (sum xs) / genericLength xs
 
 
+
+-- classivie the Node 15 or higer is high, 5 or lower low, else middle
 classivie :: Node -> Int
 classivie n = if x > 15 then 15 else (if x < 10 then 15 else 10)
               where x = average $ stats n
@@ -196,13 +202,13 @@ classivie n = if x > 15 then 15 else (if x < 10 then 15 else 10)
 easy_one :: IO ()
 easy_one = do
   node <- genRandomSudoku
-  if (classivie node) == 10 then showNode node else easy_one
+  if (classivie node) == 5 then showNode node else easy_one
 
 
 hard_one :: IO ()
 hard_one = do
   node <- genRandomSudoku
-  if (classivie node) == 10 then showNode node else hard_one
+  if (classivie node) == 15 then showNode node else hard_one
 
 
 
