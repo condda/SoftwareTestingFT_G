@@ -345,3 +345,10 @@ main = do [r] <- rsolveNs [emptyN]
           showNode r
           s  <- genProblem r
           showNode s
+
+
+
+
+
+
+
