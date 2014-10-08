@@ -22,6 +22,7 @@ factors n = let
     | n `mod` p == 0 = p: factors' (n `div` p) (p:ps)
     | otherwise      =    factors' n ps
 
+primes :: [Integer]
 primes = sieve [2..]
 sieve (n:ns) = n : sieve 
    (filter (\ m -> rem m n /= 0) ns)
@@ -66,11 +67,15 @@ fct_gcd a b =
 expM ::  Integer -> Integer -> Integer -> Integer
 expM x y = rem (x^y)
 
+-- This is our implementation of exM
 exM :: Integer -> Integer -> Integer -> Integer
 exM x 1 m = rem x m
 exM x y m
-  | (mod y 2) == 0 = (exM (rem (x*x) m) (quot y 2) m)
-  | otherwise = rem (x * (exM (rem (x*x) m) (quot (y - 1) 2) m)) m
+  | (rem y 2) == 0 = (exM x2 (quot y 2) m)
+  | otherwise = rem (x * (exM x2 (quot (y - 1) 2) m)) m
+  where x2 = (rem (x*x) m)
+
+
 
 prime_test_F :: Integer -> IO Bool
 prime_test_F n = do 
@@ -167,3 +172,11 @@ trapdoor = rsa_encode
 
 secret = m18
 bound  = 131
+
+
+carmichael :: [Integer]
+carmichael = [ (6*k+1)*(12*k+1)*(18*k+1) | 
+      k <- [2..], 
+      isPrime (6*k+1), 
+      isPrime (12*k+1), 
+      isPrime (18*k+1) ]
