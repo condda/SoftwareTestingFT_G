@@ -30,7 +30,6 @@ testExM x y z = (y < 0) || (z <= 0) || (y <= 15) || (exM x y z) == (expM x y z)
 -- exM is fast
 -- expM doesn't give an answer is reasonable time
 
-
 --3
 composed = composed_sieve [2..]
 composed_sieve (n:ns) = [(n+1)..((head$next_prime) - 1)] ++ (composed_sieve next_prime)
@@ -77,9 +76,9 @@ fake_mersenne (x:xs) = do
 
 -- doesn't work because the list is endless
 -- mersenne2 :: IO [Integer]
---mersenne2 = do sequence $ map (primeMR 1) primes
+-- mersenne2 = do sequence $ map (primeMR 1) primes
 
---showMersenne2 = do
+-- showMersenne2 = do
 --	x <- mersenne2
 --	print $ head  x
 
@@ -92,6 +91,8 @@ prime_with_bitlength n = do
 	if q
 		then return p
 		else prime_with_bitlength n
+
+--TODO write a function that generates 2 keys and use them for encoding and decoding
 
 
 
