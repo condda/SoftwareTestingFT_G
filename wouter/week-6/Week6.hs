@@ -160,7 +160,9 @@ rsa_private p q = let
    (d,p*q)
 
 rsa_encode :: (Integer,Integer) -> Integer -> Integer 
-rsa_encode (e,n) =  \ m -> exM m e n
+rsa_encode (e,n) = \ m -> exM m e n
+
+
 
 rsa_decode = rsa_encode
 
