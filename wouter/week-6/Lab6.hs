@@ -14,43 +14,38 @@ carmichael = [ (6*k+1)*(12*k+1)*(18*k+1) |
       isPrime (18*k+1) ]
 
 -- Assignment 1
--- a ^ b mod c
-exM2 :: Integer -> Integer -> Integer -> Integer
-exM2 a 0 c = 1 `rem` c
-exM2 a b c | b `rem` 2 == 0   = ((exM2 a (b `quot` 2) c) ^ 2) `rem` c
-           | otherwise        = ((exM2 a (b - 1) c) * a) `rem` c
+
 
 exTest :: Integer -> Integer -> Integer -> Bool
 exTest a b c | b <= 0 = True
              | c <= 0 = True
-             | otherwise = exM2 a b c == exM a b c
+             | otherwise = exM a b c == oldExM a b c
 
 exTest2 :: Integer -> Integer -> Integer -> Bool
 exTest2 x y z = True
 
 -- Assignment 2
 
--- exM 100 (2^32) 10
 -- using :set +s for timing, I got the following results:
 
--- exM 100 (2^24) 10 took 1.36 secs,       159623272 bytes
+-- oldExM 100 (2^24) 10 took 1.36 secs,       159623272 bytes
 
--- exM 100 ((2^24)-1) 10 took 2.53 secs,   261426480 bytes
+-- oldExM 100 ((2^24)-1) 10 took 2.53 secs,   261426480 bytes
 
--- exM2 100 (2^24) 10 took 0.00 secs,        2059024 bytes
+-- exM 100 (2^24) 10 took 0.00 secs,          2059024 bytes
 
--- exM2 100 ((2^24)-1) 10 took 0.00 secs,    2605976 bytes
-
-
+-- exM 100 ((2^24)-1) 10 took 0.00 secs,      2605976 bytes
 
 
--- exM 100 (2^26) 10 took 11.94 secs,      628208792 bytes
 
--- exM 100 ((2^26)-1) 10 took 11.94 secs, 1034963032 bytes
 
--- exM2 100 (2^26) 10 took 0.00 secs,        2059040 bytes
+-- oldExM 100 (2^26) 10 took 11.94 secs,      628208792 bytes
 
--- exM2 100 ((2^26)-1) 10 took 0.01 secs,    2575176 bytes
+-- oldExM 100 ((2^26)-1) 10 took 11.94 secs,  1034963032 bytes
+
+-- exM 100 (2^26) 10 took 0.00 secs,          2059040 bytes
+
+-- exM 100 ((2^26)-1) 10 took 0.01 secs,      2575176 bytes
 
 -- Assignment 3
 composites :: [Integer]
@@ -81,14 +76,14 @@ testCompF fn times k nos = do
   g <- testCompF fn (times - 1) k nos
   return $ if f `fn` g then f else g
 
--- testCompF (<) 100 1 composites resulted in 4    (0.00 secs, 1577184 bytes)
--- testCompF (>) 100 1 composites resulted in 63   (0.01 secs, 3150840 bytes)
+-- testCompF (<) 100 1 composites    resulted in 4    (0.00 secs, 1577184 bytes)
+-- testCompF (>) 100 1 composites    resulted in 63   (0.01 secs, 3150840 bytes)
 
--- testCompF (<) 100 2 composites resulted in 4    (0.36 secs, 176821472 bytes)
--- testCompF (>) 100 2 composites resulted in 1417 (0.25 secs, 144077600 bytes)
+-- testCompF (<) 100 2 composites    resulted in 4    (0.36 secs, 176821472 bytes)
+-- testCompF (>) 100 2 composites    resulted in 1417 (0.25 secs, 144077600 bytes)
 
--- testCompF (<) 100 3 composites resulted in 4    (4.20 secs, 962954240 bytes)
--- testCompF (>) 100 3 composites resulted in 8911 (4.96 secs, 1197929216 bytes)
+-- testCompF (<) 100 3 composites    resulted in 4    (4.20 secs, 962954240 bytes)
+-- testCompF (>) 100 3 composites    resulted in 8911 (4.96 secs, 1197929216 bytes)
 
 -- As we can see from the results above, the chance of finding a prime number is higher for a higher k.
 -- However, also memory and time increases dramatically. This is logically explainable:
@@ -99,6 +94,41 @@ testCompF fn times k nos = do
 
 
 
--- Assignment 5
--- Unfortunately testCompF (>) 100 1 carmichael freezes my PC.
--- However, testCompF (>) 1 1 carmichael did give me a very high composite number, 294409 for k = 1.
+-- Assignment 5 and 6
+b2i b = if b then 1 else 0
+
+testAl _ _ [] = return 0
+testAl al k (n:nos) = do
+  x <- al k n
+  y <- testAl al k nos
+  return $ y + (b2i $ x && (not $ isPrime n))
+
+testFPNP_probability k n = testAl primeF k (take n carmichael)
+testMRPNP_probability k n = testAl primeMR k (take n carmichael)
+
+-- testFPNP_probability k 200 resulted in 199 or 200 for a k between 1 and 3, which means
+-- that for almost all cases, primeF thinks that a carmichael number may be a prime, while
+-- that is not the case. Even with a k of 100, the result did not go lower than 191.
+
+-- testMRPNP_probability 3 200 resulted in 0, which means that for (almost) all cases,
+--   primeMR thinks that a carmichael number is NOT a prime.
+
+-- testMRPNP_probability 1 200, however, resulted in the range between 16 and 25 after a few attempts.
+
+
+-- Assignment 6
+testMRPNP _ [] = return 0
+
+testMRPNP k (n:nos) = do
+  x <- primeMR k n
+  y <- testMRPNP k nos
+  return $ y + (b2i $ x && (not $ isPrime n))
+
+-- testMRPNP 3 (take 100 carmichael) counts the amount of times
+-- that a number is prime, and considered a prime by the primeMR function.
+-- Even after running this function multiple times, the result was always 0,
+-- meaning that the primeMR-function does not recognize the carmichael
+-- numbers as possible prime numbers.
+
+-- Assignment 7
+

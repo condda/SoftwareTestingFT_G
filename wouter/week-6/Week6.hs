@@ -66,8 +66,13 @@ fct_gcd a b =
 expM ::  Integer -> Integer -> Integer -> Integer
 expM x y = rem (x^y)
 
+oldExM :: Integer -> Integer -> Integer -> Integer
+oldExM = expM
+
 exM :: Integer -> Integer -> Integer -> Integer
-exM = expM -- to be replaced by a fast version
+exM a 0 c = 1 `rem` c
+exM a b c | b `rem` 2 == 0   = ((exM a (b `quot` 2) c) ^ 2) `rem` c
+          | otherwise        = ((exM a (b - 1) c) * a) `rem` c
 
 prime_test_F :: Integer -> IO Bool
 prime_test_F n = do 
