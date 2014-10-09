@@ -233,12 +233,9 @@ intToBlocks msg bits = (msg `rem` (2^bits)) : (intToBlocks (msg `quot` (2^bits))
 blocksToInt [] bits = 0
 blocksToInt (b:bs) bits = b + (2^bits) * (blocksToInt bs bits)
 
--- TODO This does not work ...
-rsaEncodeBlocks' :: (Integer, Integer) -> Integer -> Int -> Integer
-rsaEncodeBlocks' pu msg bits = blocksToInt [ rsa_encode pu x | x <- (intToBlocks msg bits) ] bits
+rsaEncodeBlocks pu msg bits = blocksToInt [ rsa_encode pu x | x <- (intToBlocks msg bits) ] (bits * 2)
+rsaDecodeBlocks pu msg bits = blocksToInt [ rsa_encode pu x | x <- (intToBlocks msg (bits * 2)) ] bits
 
-rsaEncodeBlocks (e,n) msg bits = rsaEncodeBlocks' (e,n) msg bits
-rsaDecodeBlocks = rsaEncodeBlocks
 
 rsaEqBlocks p q sec bits = rsaDecodeBlocks pr (rsaEncodeBlocks pu sec bits) bits == sec
   where pu = rsa_public p q
@@ -248,7 +245,10 @@ prop_encode_decode_same_blocks :: Int -> Int -> Property
 prop_encode_decode_same_blocks k bits =
   monadicIO $ do p <- run $ genPrime k bits
                  q <- run $ genPrime k bits
-                 msg <- run $ randomRIO (0, 2^(bits - 1))
+                 msg <- run $ randomRIO (0, 2^(bits * 4))
                  run $ print $ (show p) ++ " " ++ (show q) ++ " " ++ (show msg)
                  assert $ p == q || rsaEqBlocks p q msg bits
 
+-- The property can be tested using:
+
+-- quickCheck (prop_encode_decode_same_blocks 5 512)
