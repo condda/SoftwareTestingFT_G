@@ -71,7 +71,7 @@ expM x y = rem (x^y)
 exM :: Integer -> Integer -> Integer -> Integer
 exM x 1 m = rem x m
 exM x y m
-  | (rem y 2) == 0 = (exM x2 (quot y 2) m)
+  | even y = (exM x2 (quot y 2) m)
   | otherwise = rem (x * (exM x2 (quot (y - 1) 2) m)) m
   where x2 = (rem (x*x) m)
 

@@ -51,7 +51,7 @@ carmichaels_pass_fermat = numbers_that_pass_the_fermat_test carmichael
 -- 6
 numbers_that_pass_the_miller_rabin_test :: [Integer] -> IO ()
 numbers_that_pass_the_miller_rabin_test (x:xs) = do
-	p <- (primeMR 1 x)
+	p <- (primeMR 3 x)
 	if p
 		then do
 			print x
@@ -65,7 +65,7 @@ carmichaels_pass_miller = numbers_that_pass_the_miller_rabin_test carmichael
 fake_mersenne :: [Integer] -> IO ()
 fake_mersenne [] = print "end"
 fake_mersenne (x:xs) = do
-	p <- (primeMR 1 ((2^x) - 1))
+	p <- (primeMR 3 ((2^x) - 1))
 	if p
 		then do
 			print x
@@ -84,10 +84,10 @@ fake_mersenne (x:xs) = do
 
 -- 8
 
-prime_with_bitlength :: Integer -> IO Integer
-prime_with_bitlength n = do
+prime_with_bitlength :: Int -> Integer -> IO Integer
+prime_with_bitlength k n = do
 	p <- randomRIO(2^(n-1), 2^n)
-	q <- primeMR 4 p
+	q <- primeMR k p
 	if q
 		then return p
 		else prime_with_bitlength n
